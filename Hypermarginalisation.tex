@@ -1,0 +1,117 @@
+\documentclass{article}
+\usepackage{nips12submit_e,times}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{bm}
+
+\title{Approximate Hyperparameter Marginalisation for Gaussian Processes}
+
+\author{
+Rob\\
+\And
+Jan\\
+\And
+Mike\\
+\And
+Steve\\
+\And
+Steve\\}
+
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to \LaTeX{} to determine where to break
+% the lines. Using \AND forces a linebreak at that point. So, if \LaTeX{}
+% puts 3 of 4 authors names on the first line, and the last on the second
+% line, try using \AND instead of \And before the third author name.
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+%\nipsfinalcopy % Uncomment for camera-ready version
+
+
+\begin{document}
+
+
+\maketitle
+
+%------- ABSTRACT --------
+\begin{abstract}
+Enter Abstract here
+\end{abstract}
+
+
+%------- INTRODUCTION--------
+\section{Introduction}
+
+
+
+%------- GAUSSIAN PROCESSES--------
+\section{Gaussian Processes}
+
+Gaussian processes (\verb"GPs") constitute a powerful method for performing Bayesian inference about functions using a limited set of observations \cite{rassandwill}. A \verb"GP" is defined as a distribution over the functions $f : \mathcal{X} \rightarrow \mathbb{R}$ such that the distribution over the possible function values on any finite set of $\mathcal{X}$ is multi-variate Gaussian. Given some arbitrary size $n$ dataset, the observations $\mathbf{y} = \{ y_1,...,y_n\}$ could be viewed as a single point sampled from a $n$-variate Gaussian distribution and can be partnered with a \verb"GP".
+%One can imagine a point $x_i \in \mathcal{X}$ as having an associated random variable $Y_i$ representing the possible values the function can take at that point, the \verb"GP" is therefore the infinite set of such random variables defined across the domain of the function. If we take a sample from a \verb"GP" at a finite set of input locations $\mathbf{x} = \{x_1,...,x_n\}$, the corresponding observations $\mathbf{y} = \{ y_1,...,y_n\}$ can be viewed as a single point sampled from some multi-variate Gaussian distribution.
+
+A \verb"GP" is completely defined by its first and second moments: a mean function $\mu : \mathcal{X} \rightarrow \mathbb{R}$ which describes the overall trend of the function, and a symmetric positive semidefinite covariance function $K : \mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}$ which describes how function values are correlated as a function of their locations in the domain. Given a function $f : \mathcal{X} \rightarrow \mathbb{R}$ and a set of input points $\mathbf{x} \subset \mathcal{X}$, the Gaussian process prior distribution over the function values $\mathbf{f} = f(\mathbf{x})$ is given by:
+\begin{align}
+p(\mathbf{f} | \mathbf{x},\bm{\theta}) &= \mathcal{N}\left( \mathbf{f};\mu(\mathbf{x},\bm{\theta}),K(\mathbf{x},\mathbf{x},\bm{\theta}) \right) \\
+&= \frac{1}{\sqrt{\mathrm{det} 2 \pi K_{\mathbf{f}}} } \exp \left( - \frac{1}{2} (\mathbf{f}-\mu_{\mathbf{f}})^\top K_\mathbf{f}^{-1} (\mathbf{f}-\mu_{\mathbf{f}})  \right)
+\end{align}
+where $\bm{\theta}$ is a vector containing any parameters required by $\mu$ and $K$, and which form the \emph{hyperparameters} of the model. There exists a wide variety of mean and covariance functions which can be chosen in order to reflect any prior knowledge available about the function of interest.
+
+
+
+%------- APPROXIMATE HYPERPARAMETER MARGINALISATION --------
+\section{Approximate Hyperparameter Marginalisation}
+
+\subsection{Proof of Positive Semi-Definiteness}
+
+A sum of kernels is itself a kernel, which by definition fulfils the necessary condition of positive semi-definiteness. Therefore:
+\begin{equation}
+K = \int k(\beta)p(\beta)d\beta
+\end{equation}
+
+
+%------- EXPERIMENTS --------
+\section{Experiments}
+
+
+
+
+%------- RELATED WORK --------
+\section{Related Work}
+
+
+
+
+%------- CONCLUSION --------
+\section{Conclusion}
+
+
+
+%---------ACKNOWLEDGEMENTS-----------
+\subsubsection*{Acknowledgments}
+Do we have any? Aladdin / Orchid?
+
+
+%------------REFERENCES----------------
+\subsubsection*{References}
+\renewcommand{\refname}{\vskip -0.75cm}  %Removes the "References" title
+\bibliographystyle{plain}
+\small{
+\bibliography{Hypermarginalisation}
+}
+
+
+
+
+\end{document}
+
+
+
+
+
+
