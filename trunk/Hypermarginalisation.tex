@@ -55,14 +55,17 @@ Enter Abstract here
 Gaussian processes (\verb"GPs") constitute a powerful method for performing Bayesian inference about functions using a limited set of observations \cite{rassandwill}. A \verb"GP" is defined as a distribution over the functions $f : \mathcal{X} \rightarrow \mathbb{R}$ such that the distribution over the possible function values on any finite set of $\mathcal{X}$ is multi-variate Gaussian. Given some arbitrary size $n$ dataset, the observations $\mathbf{y} = \{ y_1,...,y_n\}$ could be viewed as a single point sampled from a $n$-variate Gaussian distribution and can be partnered with a \verb"GP".
 %One can imagine a point $x_i \in \mathcal{X}$ as having an associated random variable $Y_i$ representing the possible values the function can take at that point, the \verb"GP" is therefore the infinite set of such random variables defined across the domain of the function. If we take a sample from a \verb"GP" at a finite set of input locations $\mathbf{x} = \{x_1,...,x_n\}$, the corresponding observations $\mathbf{y} = \{ y_1,...,y_n\}$ can be viewed as a single point sampled from some multi-variate Gaussian distribution.
 
-A \verb"GP" is completely defined by its first and second moments: a mean function $\mu : \mathcal{X} \rightarrow \mathbb{R}$ which describes the overall trend of the function, and a symmetric positive semidefinite covariance function $K : \mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}$ which describes how function values are correlated as a function of their locations in the domain. Given a function $f : \mathcal{X} \rightarrow \mathbb{R}$ and a set of input points $\mathbf{x} \subset \mathcal{X}$, the Gaussian process prior distribution over the function values $\mathbf{f} = f(\mathbf{x})$ is given by:
+A \verb"GP" is completely defined by its first and second moments: a mean function $\mu : \mathcal{X} \rightarrow \mathbb{R}$ which describes the overall trend of the function, and a symmetric positive semidefinite covariance function $K : \mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}$ which describes how function values are correlated as a function of their locations in the domain. Given a function $f : \mathcal{X} \rightarrow \mathbb{R}$ which we would like to perform inference about, and a set of input points $\mathbf{x} \subset \mathcal{X}$, the Gaussian process prior distribution over the function values $\mathbf{f} = f(\mathbf{x})$ is given by:
 \begin{align}
-p(\mathbf{f} | \mathbf{x},\bm{\theta}) &= \mathcal{N}\left( \mathbf{f};\mu(\mathbf{x},\bm{\theta}),K(\mathbf{x},\mathbf{x},\bm{\theta}) \right) \\
-&= \frac{1}{\sqrt{\mathrm{det} 2 \pi K_{\mathbf{f}}} } \exp \left( - \frac{1}{2} (\mathbf{f}-\mu_{\mathbf{f}})^\top K_\mathbf{f}^{-1} (\mathbf{f}-\mu_{\mathbf{f}})  \right)
+p(\mathbf{f} | \mathbf{x},\bm{\theta},I) &:= \mathcal{N}\left( \mathbf{f};\mu(\mathbf{x},\bm{\theta}),K(\mathbf{x},\mathbf{x},\bm{\theta}) \right) \\
+&:= \frac{1}{\sqrt{\mathrm{det} 2 \pi K_{\mathbf{f}}} } \exp \left( - \frac{1}{2} (\mathbf{f}-\mu_{\mathbf{f}})^\top K_\mathbf{f}^{-1} (\mathbf{f}-\mu_{\mathbf{f}})  \right)
 \end{align}
-where $\bm{\theta}$ is a vector containing any parameters required by $\mu$ and $K$, and which form the \emph{hyperparameters} of the model. There exists a wide variety of mean and covariance functions which can be chosen in order to reflect any prior knowledge available about the function of interest.
+where $\bm{\theta}$ is a vector containing any parameters required by $\mu$ and $K$, and which form the \emph{hyperparameters} of the model. There exists a wide variety of mean and covariance functions which can be chosen in order to reflect any prior knowledge available about the function of interest. Note also that we need not place a \verb"GP" directly on the function, for example a function known to be strictly positive might benefit from a \verb"GP" over its logarithm.
 
+%Observations
+Once observations of the function are available, these can be incorporated 
 
+%Hyperparameters
 
 
 
