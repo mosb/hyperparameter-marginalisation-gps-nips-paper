@@ -60,23 +60,37 @@ A \verb"GP" is completely defined by its first and second moments: a mean functi
 p(\mathbf{f} | \mathbf{x},\bm{\theta},I) &:= \mathcal{N}\left( \mathbf{f};\mu_\theta(\mathbf{x}),K_\theta(\mathbf{x},\mathbf{x}) \right) \\
 &:= \frac{1}{\sqrt{\mathrm{det} 2 \pi K_{\mathbf{f}}} } \exp \left( - \frac{1}{2} (\mathbf{f}-\mu_{\mathbf{f}})^\top K_\mathbf{f}^{-1} (\mathbf{f}-\mu_{\mathbf{f}})  \right)
 \end{align}
-where $\bm{\theta}$ is a vector containing any parameters required by $\mu$ and $K$, and which form the \emph{hyperparameters} of the model. There exists a wide variety of mean and covariance functions which can be chosen in order to reflect any prior knowledge available about the function of interest. Note also that we need not place a \verb"GP" directly on the function, for example a function known to be strictly positive might benefit from a \verb"GP" over its logarithm.
+where $\bm{\theta}$ is a vector containing any parameters required by $\mu$ and $K$, and which form the \emph{hyperparameters} of the model, $I$. %The context, $I$, forms the background knowledge upon which all our probabilities are conditioned. Its ubiquity leads us to henceforth drop it from explicit representation.
+There exist a wide variety of mean and covariance functions which can be chosen in order to reflect any prior knowledge available about the function of interest. Note also that we need not place a \verb"GP" directly on the function, for example a function known to be strictly positive might benefit from a \verb"GP" over its logarithm.
 
 %Observations
 Once we have observations of the function $(\mathbf{x_s},\mathbf{y_s})$ we can make predictions about the function value $f_*$ at input $x_*$. As exact measurements of the function are often not available we assume a noise model, such that:
 \begin{equation}
-p(y | f, x, \sigma_n^2) = \mathcal{N}(y; f, \sigma_n^2)
+p(y | f, x, \sigma_n^2,I) := \mathcal{N}(y; f, \sigma_n^2)
 \end{equation} 
 which represents i.i.d Gaussian observation noise with variance $\sigma_n^2$. As should be expected, the predictive distribution over $f_*$ is Gaussian:
-\begin{equation}
-p(f_* | \mathbf{y_s},\bm{\theta}) = \mathcal{N} ( f_* ; m_\theta(f_* | \mathbf{y_s}), C_\theta(f_* | \mathbf{y_s}))
+\begin{equation}\label{obsnoise}
+p(f_* | x_*, \mathbf{y_s},\bm{\theta},I) := \mathcal{N} ( f_* ; m_\theta(f_* | x_*, \mathbf{y_s}), C_\theta(f_* | x_*, \mathbf{y_s}))
 \end{equation}
 where the posterior mean and covariance are:
 \begin{align}
-m_\theta(f_* | \mathbf{y_s}, \bm{\theta}) = \mu_\theta(x_*) + K_\theta(x_*,\mathbf{x_s})V^{-1}(\mathbf{y_s} - \mu_\theta(x_*))\\
-C_\theta(f_* | \mathbf{y_s}) = K_\theta(x_*,x_*) - K_\theta(x_*,\mathbf{x_s})V^{-1}K_\theta(\mathbf{x_s},x_*)\\
-\mathrm{where}\quad V = K_\theta(\mathbf{x_s},\mathbf{x_s}) + \sigma_n^2\mathbf{I}
+m_\theta(f_* | x_*, \mathbf{y_s}) := \mu_\theta(x_*) + K_\theta(x_*,\mathbf{x_s})V^{-1}(\mathbf{y_s} - \mu_\theta(x_*))\\
+C_\theta(f_* | x_*, \mathbf{y_s}) := K_\theta(x_*,x_*) - K_\theta(x_*,\mathbf{x_s})V^{-1}K_\theta(\mathbf{x_s},x_*)\\
+\mathrm{where}\quad V := K_\theta(\mathbf{x_s},\mathbf{x_s}) + \sigma_n^2\mathbf{I}
 \end{align}
+
+\subsection{Dealing with Hyperparameters}
+%Marginalisation
+The previous equations assume that the hyperparameters $\bm{\theta}$ are known; in fact we can rarely be certain about $\bm{\theta}$ \emph{a priori} which we can represent by proposing a suitably uninformative prior distribution $p(\bm{\theta}|I)$. Given such a hyper-prior, the hyperparameters should be marginalised to calculate the predictive distribution over $f_*$:
+\begin{equation}\label{fullmargint}
+p(f_* |x_*, \mathbf{y_s},I) = \frac{\int p(f_* | x_*, \mathbf{y_s},\bm{\theta},I)p(\mathbf{y_s}|\mathbf{x_s},\bm{\theta},I)p(\bm{\theta}|I)d\bm{\theta}}{\int p(\mathbf{y_s}|\mathbf{x_s},\bm{\theta},I)p(\bm{\theta}|I)d\bm{\theta}}
+\end{equation}
+Unfortunately such integrals are generally non-analytic, but can be well approximated by use of Bayesian Monte Carlo \cite{bayesquad} techniques. This involves evaluating our predictions for a range of hyperparameter samples $\{ \bm{\theta_i} : i \in S\}$, with a different mean $m_{\theta_i}(f_* | x_*, \mathbf{y_s})$ and covariance $C_{\theta_i}(f_* | x_*, \mathbf{y_s})$ for each, which are then combined in a weighted mixture:
+\begin{equation}
+p(f_* |x_*, \mathbf{y_s},I) \simeq \sum_{i \in S} \rho_i N(f_* ; m_{\theta_i}(f_* | x_*, \mathbf{y_s}),C_{\theta_i}(f_* | x_*, \mathbf{y_s}))
+\end{equation}
+with weights $\bm{\rho}$ as detailed in \cite{osborne2008towards}. This approach will give us a close approximation to full marginalisation, but in order to take meaningful number of samples suffers from high computational costs. A far less demanding approach is to choose a single $\bm{\theta}$ which maximises the marginal likelihood 
+
 
 
 
@@ -119,7 +133,7 @@ Do we have any? Aladdin / Orchid?
 %------------REFERENCES----------------
 \subsubsection*{References}
 \renewcommand{\refname}{\vskip -0.75cm}  %Removes the "References" title
-\bibliographystyle{plain}
+\bibliographystyle{unsrt}
 \small{
 \bibliography{Hypermarginalisation}
 }
