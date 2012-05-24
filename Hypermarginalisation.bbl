@@ -5,4 +5,18 @@ C.~E. Rasmussen and C.~K.~I. Williams.
 \newblock {\em {Gaussian Processes for Machine Learning}}.
 \newblock MIT Press Cambridge, MA, USA, 2006.
 
+\bibitem{bayesquad}
+C.E. Rasmussen and Z.~Ghahramani.
+\newblock Bayesian monte carlo.
+\newblock {\em Advances in neural information processing systems}, 15:489--496,
+  2003.
+
+\bibitem{osborne2008towards}
+M.A. Osborne, SJ~Roberts, A.~Rogers, SD~Ramchurn, and N.R. Jennings.
+\newblock Towards real-time information processing of sensor network data using
+  computationally efficient multi-output gaussian processes.
+\newblock In {\em Proceedings of the 7th international conference on
+  Information processing in sensor networks}, pages 109--120. IEEE Computer
+  Society, 2008.
+
 \end{thebibliography}
