@@ -1,46 +1,46 @@
 This is BibTeX, Version 0.99d (TeX Live 2011)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: Hypermarginalisation.aux
-The style file: unsrt.bst
+The style file: plain.bst
 Database file #1: Hypermarginalisation.bib
 You've used 3 entries,
-            1791 wiz_defined-function locations,
-            463 strings with 4137 characters,
-and the built_in function-call counts, 830 in all, are:
-= -- 78
-> -- 33
+            2118 wiz_defined-function locations,
+            515 strings with 4612 characters,
+and the built_in function-call counts, 1157 in all, are:
+= -- 115
+> -- 54
 < -- 1
-+ -- 12
-- -- 9
-* -- 48
-:= -- 127
++ -- 21
+- -- 18
+* -- 75
+:= -- 190
 add.period$ -- 10
 call.type$ -- 3
-change.case$ -- 2
+change.case$ -- 17
 chr.to.int$ -- 0
 cite$ -- 3
-duplicate$ -- 40
-empty$ -- 81
-format.name$ -- 9
-if$ -- 192
+duplicate$ -- 46
+empty$ -- 90
+format.name$ -- 18
+if$ -- 247
 int.to.chr$ -- 0
 int.to.str$ -- 3
 missing$ -- 4
 newline$ -- 18
-num.names$ -- 3
-pop$ -- 14
+num.names$ -- 6
+pop$ -- 23
 preamble$ -- 1
-purify$ -- 0
+purify$ -- 15
 quote$ -- 0
-skip$ -- 21
+skip$ -- 33
 stack$ -- 0
-substring$ -- 57
+substring$ -- 72
 swap$ -- 13
 text.length$ -- 1
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 0
+type$ -- 10
 warning$ -- 0
-while$ -- 8
+while$ -- 11
 width$ -- 4
 write$ -- 35
