@@ -57,12 +57,12 @@ Enter Abstract here
 Gaussian processes (\verb"GPs") constitute a powerful method for performing Bayesian inference about functions using a limited set of observations \cite{rassandwill}. A \verb"GP" is defined as a distribution over the functions $f : \mathcal{X} \rightarrow \mathbb{R}$ such that the distribution over the possible function values on any finite set of $\mathcal{X}$ is multi-variate Gaussian. Given some arbitrary size $n$ dataset, the observations $\mathbf{y} = \{ y_1,...,y_n\}$ could be viewed as a single point sampled from a $n$-variate Gaussian distribution and can be partnered with a \verb"GP".
 %One can imagine a point $x_i \in \mathcal{X}$ as having an associated random variable $Y_i$ representing the possible values the function can take at that point, the \verb"GP" is therefore the infinite set of such random variables defined across the domain of the function. If we take a sample from a \verb"GP" at a finite set of input locations $\mathbf{x} = \{x_1,...,x_n\}$, the corresponding observations $\mathbf{y} = \{ y_1,...,y_n\}$ can be viewed as a single point sampled from some multi-variate Gaussian distribution.
 
-A \verb"GP" is completely defined by its first and second moments: a mean function $\mu : \mathcal{X} \rightarrow \mathbb{R}$ which describes the overall trend of the function, and a symmetric positive semidefinite covariance function $K : \mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}$ which describes how function values are correlated as a function of their locations in the domain. Given a function $f : \mathcal{X} \rightarrow \mathbb{R}$ which we would like to perform inference about, and a set of input points $\mathbf{x} \subseteq \mathcal{X}$, the Gaussian process prior distribution over the function values $\mathbf{f} = f(\mathbf{x})$ is given by:
+A \verb"GP" is completely defined by its first and second moments: a mean function $\mu : \mathcal{X} \rightarrow \mathbb{R}$ which describes the overall trend of the function, and a symmetric positive semidefinite covariance function $K : \mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}$ which describes how function values are correlated as a function of their locations in the domain. Given a function $f : \mathcal{X} \rightarrow \mathbb{R}$ which we would like to perform inference abouts and a set of input points $\mathbf{x} \subseteq \mathcal{X}$, the Gaussian process prior distribution over the function values $\mathbf{f} = f(\mathbf{x})$ is given by:
 \begin{align}
 p(\mathbf{f} | \mathbf{x},\bm{\theta},I) &:= \mathcal{N}\left( \mathbf{f};\mu_\theta(\mathbf{x}),K_\theta(\mathbf{x},\mathbf{x}) \right) \\
 &:= \frac{1}{\sqrt{\mathrm{det} 2 \pi K_{\mathbf{f}}} } \exp \left( - \frac{1}{2} (\mathbf{f}-\mu_{\mathbf{f}})^\top K_\mathbf{f}^{-1} (\mathbf{f}-\mu_{\mathbf{f}})  \right)
 \end{align}
-where $\bm{\theta}$ is a vector containing any parameters required by $\mu$ and $K$, and which form the \emph{hyperparameters} of the model, $I$. Due to the ubiquity of $I$ we henceforth drop it from explicit representation for notational convenience. %The context, $I$, forms the background knowledge upon which all our probabilities are conditioned. Its ubiquity leads us to henceforth drop it from explicit representation.
+where $\bm{\theta}$ is a vector containing any parameters required by $\mu$ and $K$: the \emph{hyperparameters} of the model, $I$. Due to the ubiquity of $I$ we henceforth drop it from explicit representation for notational convenience. %The context, $I$, forms the background knowledge upon which all our probabilities are conditioned. Its ubiquity leads us to henceforth drop it from explicit representation.
 There exist a wide variety of mean and covariance functions which can be chosen in order to reflect any prior knowledge available about the function of interest. Note also that we need not place a \verb"GP" directly on the function, for example a function known to be strictly positive might benefit from a \verb"GP" over its logarithm.
 
 %Observations
@@ -107,6 +107,52 @@ The value of $\bm{\theta}$ which maximises (\ref{marglikelihood}) can be inserte
 %------- APPROXIMATE HYPERPARAMETER MARGINALISATION --------
 \section{Approximate Hyperparameter Marginalisation}
 
+$L = \exp(\beta)$
+
+\begin{align}
+p(\beta|\beta_m,\beta_v) &= \mathcal{N}(\beta; \beta_m, \beta_v)\\
+&= \frac{1}{\sqrt{2 \pi \beta_v}} \exp \left( \frac{ -(\beta - \beta_m)^2}{2\beta_v} \right)
+\end{align}
+
+\begin{align}
+K_\beta &= \exp \left( -\ln \frac{1}{K_\beta} \right)\\ 
+&= \exp \left( -A \right)
+\end{align}
+
+
+\begin{equation} \label{taylorexpansion}
+A \approx \ln \frac{1}{K_{\beta}}\bigg|_{\beta_m} + (\beta-\beta_m) \frac{\partial{A}}{\partial{\beta}}\bigg|_{\beta_m} + \frac{1}{2}(\beta-\beta_m)^2 \frac{\partial^2{A}}{\partial^2{\beta}}\bigg|_{\beta_m}
+\end{equation}
+
+\begin{align}%Probably use this earlier
+K_\beta &= h^2 \exp\left( -\frac{1}{2}\bigtriangleup^2 \exp(-2\beta) \right)\\
+K^\prime_\beta &= K_\beta \left( \bigtriangleup^2 \exp(-2\beta)  \right) \\
+K^{\prime\prime}_\beta &= K_\beta \left( \bigtriangleup^4 \exp(-4\beta) -  \bigtriangleup^2 \exp(-2\beta) \right)
+\end{align}
+
+\begin{align}
+A &= \ln \frac{1}{K_\beta} \\
+\frac{\partial{A}}{\partial{\beta}} &= -\frac{K^\prime_\beta}{K_\beta} = \; \bigtriangleup^2 \exp(-2\beta)\\
+\frac{\partial^2{A}}{\partial^2{\beta}} &= -\frac{K^{\prime\prime}_\beta}{K_\beta} + \frac{{K^\prime_\beta}^2}{K_\beta^2} = \; 2 \bigtriangleup^2 \exp(-2\beta)
+\end{align}
+
+$C = \bigtriangleup^2 \exp(-2\beta_m)$
+
+%... from Taylor Expansion
+\begin{align}
+K_\beta &\approx \exp \left(-\left( \ln \frac{1}{K_{\beta_m}} + (\beta-\beta_m) C + (\beta-\beta_m)^2 C \right)   \right)\\
+&= K_{\beta_m} \, \exp \left( (\beta-\beta_m) C + (\beta-\beta_m)^2 C \right)
+\end{align}
+
+%Marginalising Beta
+\begin{align}
+K_{\beta_m,\beta_v} &= \int_{-\infty}^{+\infty} K_\beta \; p(\beta|\beta_m,\beta_v) d\beta \\
+&= K_{\beta_m}\int_{-\infty}^{+\infty} \frac{1}{\sqrt{2 \pi \beta_v}} \exp \left( \frac{ -(\beta - \beta_m)^2}{2\beta_v} \right) \left( (\beta-\beta_m) C + (\beta-\beta_m)^2 C \right) \\
+&= K_{\beta_m} \; \exp \left( \frac{\beta_v\, C^2}{2(1+2\beta_v C)} \right) \frac{1}{\sqrt{1+ 2\beta_v C}}
+\end{align}
+
+
+
 
 
 
@@ -114,10 +160,35 @@ The value of $\bm{\theta}$ which maximises (\ref{marglikelihood}) can be inserte
 
 \subsection{Proof of Positive Semi-Definiteness}
 
-A sum of kernels is itself a kernel, which by definition fulfils the necessary condition of positive semi-definiteness. Therefore:
+*+*+*+*+ I'll tidy this up!
+
+A sum of kernel is itself a kernel, which by definition fulfils the necessary condition of positive semi-definiteness. Therefore:
 \begin{equation}
-K = \int k(\beta)p(\beta)d\beta
+K_{\beta_m,\beta_v} = \int K_\beta \;p(\beta)d\beta
 \end{equation}
+should be a legitimate kernel if $K_\beta$ is also a legitimate kernel as $p(\beta)$ just weights the contents of the integral.
+
+%From above SAME EQUATION!!!! (SO REMOVE LATER)
+\begin{equation}
+K_\beta = K_{\beta_m} \, \exp \left( (\beta-\beta_m) C + (\beta-\beta_m)^2 C \right)
+\end{equation}
+completing the square:
+\begin{align}
+K_\beta &= K_{\beta_m} \,  \exp \left(  -\frac{1}{2} (\beta - \beta_m - 1) ^ 2C   \right) \exp \left( \frac{1}{2}C \right) \\
+\end{align}
+Product of kernels is also a kernel. Therefore if all three parts of the above equation are kernel, then $K_\beta$ is also a covariance function. First two parts are kernels, the last part isn't. However:
+\begin{align}
+K_{\beta_m} &= h^2 \exp\left( -\frac{1}{2}\bigtriangleup^2 \exp(-2\beta_m) \right)\\
+&= h^2 \exp\left( -\frac{C}{2} \right)\\
+K_{\beta_m} \exp \left( \frac{1}{2}C \right) &= h^2 \exp\left( -\frac{C}{2} \right) \exp \left( \frac{1}{2}C \right) \\
+&= h^2 \exp\left( 0 \right)
+\end{align}
+so $K_\beta$ is a kernel.
+
+*+*+*+*+ I need to check this, as the result has changed since I did my substitution...
+
+
+
 
 
 %------- EXPERIMENTS --------
