@@ -86,7 +86,7 @@ C_\theta(f_* | x_*, \yd) := K_\theta(x_*,x_*) - K_\theta(x_*,\xd)V^{-1}K_\theta(
 \mathrm{where}\quad V := K_\theta(\xd,\xd) + \sigma_n^2\mathbf{I}
 \end{align}
 
-\subsection{Dealing with Hyperparameters}
+\subsection{Marginalising out the Hyperparameters}
 %Marginalisation
 The previous equations assume that the hyperparameters $\bm{\theta}$ are known; in fact we can rarely be certain about $\bm{\theta}$ \emph{a priori}. This ignorance can be represented by a suitably uninformative prior distribution $p(\bm{\theta})$. Given such a \emph{hyper-prior}, the hyperparameters can be marginalised to calculate the predictive distribution over $f_*$:
 \begin{equation}\label{fullmargint}
@@ -111,7 +111,7 @@ where $\bm{\theta}_{\mathrm{ML}}$ is the hyperparameter vector that maximises th
 \begin{equation}
 \bm{\theta}_{\mathrm{ML}} = \argmax_{\bm{\theta}} \;\; p(\yd|\xd,\bm{\theta})\,.
 \end{equation}
-As per Figure ****, \eqref{eq:ML} is equivalent to approximating the likelihood $p(\yd|\xd,\bm{\theta}$ as the delta function $\delta(\theta - \theta_{\mathrm{ML}})$. This assumption is a poor representation of our true state of ignorance given only low numbers of data, for which the likelihood is typically broad and/or multi-modal. As a consequence, type II maximum likelihood can often lead to over-fitting. Nonetheless, the less onerous computational requirements of this approach have made it ubiquitous throughout machine learning. 
+As per Figure ****, \eqref{eq:ML} is equivalent to approximating the likelihood $p(\yd|\xd,\bm{\theta})$ as the delta function $\delta(\theta - \theta_{\mathrm{ML}})$. This assumption is a poor representation of our true state of ignorance given only low numbers of data, for which the likelihood is typically broad and/or multi-modal. As a consequence, type II maximum likelihood can often lead to over-fitting. Nonetheless, the less onerous computational requirements of this approach have made it ubiquitous throughout machine learning. 
 
 *+*+*+*+*+*+*+ TEXT NEEDED!!! - Insert comment about what our paper does as a gap between the two methods just discussed *+*+*+*+*+*+*+*+
 
