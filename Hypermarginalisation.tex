@@ -95,7 +95,7 @@ The previous equations assume that the hyperparameters $\bm{\theta}$ are known; 
 \begin{equation}\label{fullmargint}
 p(f_* |x_*, \yd) = \frac{\int p(f_* | x_*, \yd,\bm{\theta})p(\yd|\xd,\bm{\theta})p(\bm{\theta})d\bm{\theta}}{\int p(\yd|\xd,\bm{\theta})p(\bm{\theta})d\bm{\theta}}
 \end{equation}
-Unfortunately, such integrals are generally non-analytic, requiring numerical approximation. Randomized Monte Carlo techniques \citet{chen2000monte} form the most popular approaches to numerical integration, although Bayesian alternatives \cite{bayesquad, osborne_aistats} also exist. 
+Unfortunately, such integrals are generally non-analytic, requiring numerical approximation. Randomized Monte Carlo techniques \cite{chen2000monte} form the most popular approaches to numerical integration, although Bayesian alternatives \cite{bayesquad, osbornebayesquad} also exist. 
 These techniques estimate the integral given
 the value of the integrand on a set of sample points, usually via a weighted mixture
 \begin{equation}\label{sampling}
@@ -120,6 +120,21 @@ As per Figure ****, \eqref{eq:ML} is equivalent to approximating the likelihood 
 
 %------- APPROXIMATE HYPERPARAMETER MARGINALISATION --------
 \section{Approximate Hyperparameter Marginalisation}
+
+In this section we introduce an approximate method for performing inference using a Gaussian Process which accommodates the inherent uncertainty one should have about the value of hyperparameters, but which does not suffer from excessive computational expense. Rather than attempt to approximate the integral in (\ref{fullmargint}), we present a philosophical shift away from the standard \verb"GP" prior opting instead to develop a new prior which incorporates and marginalises the uncertainty in the hyperparameters \emph{before} fusing the prior with observations. The result is an adjusted covariance function which can be used interchangeably with a standard covariance function in \verb"GP" inference, but whose parameters are now \emph{hyper-hyperparameters} explaining the marginalised covariance function.
+
+\subsection{The Squared Exponential Covariance Function}
+
+One of the most pervasive covariance functions used in Bayesian inference is the \emph{Squared Exponential}, or \emph{Gaussian} kernel:
+\begin{align}
+K(x,x^\prime) = 
+\end{align}
+
+
+
+
+
+
 
 $L = \exp(\beta)$
 
