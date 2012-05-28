@@ -67,7 +67,7 @@ Gaussian processes (\verb"GPs") constitute a powerful method for performing Baye
 
 A \verb"GP" is completely defined by its first and second moments: a mean function $\mu : \mathcal{X} \rightarrow \mathbb{R}$, which describes the overall trend of the function, and a positive semidefinite covariance function, or kernel, $K : \mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}$ which describes how function values are correlated as a function of their locations in the domain. Given a function $f : \mathcal{X} \rightarrow \mathbb{R}$ about which we wish to perform inference and a set of input points $\mathbf{x} \subseteq \mathcal{X}$, the Gaussian process prior distribution over the function values $\mathbf{f} = f(\mathbf{x})$ is given by:
 \begin{align}
-p(\mathbf{f} | \mathbf{x},\bm{\theta},I) &:= \mathcal{N}\left( \mathbf{f};\mu_\theta(\mathbf{x}),K_\theta(\mathbf{x},\mathbf{x}) \right) \\
+p(\mathbf{f} | \mathbf{x},\bm{\theta},I) &:= \mathcal{N}\left( \mathbf{f};\mu_\theta(\mathbf{x}),K_\theta(\mathbf{x},\mathbf{x}) \right) \nonumber \\
 &:= \frac{1}{\sqrt{\mathrm{det} 2 \pi K_{\mathbf{f}}} } \exp \left( - \frac{1}{2} (\mathbf{f}-\mu_{\mathbf{f}})^\top K_\mathbf{f}^{-1} (\mathbf{f}-\mu_{\mathbf{f}})  \right)
 \end{align}
 where $\bm{\theta}$ is a vector containing any parameters required by $\mu$ and $K$: the \emph{hyperparameters} of the model, $I$. Due to the ubiquity of $I$ we henceforth drop it from explicit representation for notational convenience. %The context, $I$, forms the background knowledge upon which all our probabilities are conditioned. Its ubiquity leads us to henceforth drop it from explicit representation.
@@ -86,9 +86,9 @@ p(f_* | x_*, \yd,\bm{\theta}) := \mathcal{N} ( f_* ; m_\theta(f_* | x_*, \yd), C
 where the posterior mean and covariance are:
 \begin{align}
 m_\theta(f_* | x_*, \yd) := \mu_\theta(x_*) + K_\theta(x_*,\xd)V^{-1}(\yd - \mu_\theta(x_*))\\
-C_\theta(f_* | x_*, \yd) := K_\theta(x_*,x_*) - K_\theta(x_*,\xd)V^{-1}K_\theta(\xd,x_*)\\
-\mathrm{where}\quad V := K_\theta(\xd,\xd) + \sigma_n^2\mathbf{I}
+C_\theta(f_* | x_*, \yd) := K_\theta(x_*,x_*) - K_\theta(x_*,\xd)V^{-1}K_\theta(\xd,x_*)
 \end{align}
+where $V := K_\theta(\xd,\xd) + \sigma_n^2\mathbf{I}$.
 
 \subsection{Marginalising out the Hyperparameters}
 %Marginalisation
@@ -135,98 +135,78 @@ where $\bigtriangleup^2 = (x - x^\prime)^2$, and $h$ is a scaling parameter term
 \subsubsection{Incorporating Uncertainty}
 
 The standard \verb"GP" prior assumes that the value of $L$ is deterministic; any distribution an individual has over $L$ is purely the epistemic characterisation of their uncertainty in the `true' value of $L$. We alter the prior such that we make $L$ a random variable with its own generative distribution $p(L)$. The value of $L$ should be strictly positive, hence we make the substitution $L=exp(\beta)$ and define a Gaussian distribution over $\beta$ so that $p(L)$ will have strictly positive support: 
-\begin{equation}
+\begin{equation}\label{betaSEkernel}
 K_\theta(x,x^\prime) = h^2 \exp \left( -\frac{1}{2}\bigtriangleup^2 \exp(-2\beta) \right)
 \end{equation}
 which we will write as $K_\beta$, and
 \begin{align}
-p(\beta|\nu,\Lambda) &= \mathcal{N}(\beta; \nu, \Lambda)\\
-&= \frac{1}{\sqrt{2 \pi \Lambda}} \exp \left( \frac{ -(\beta - \nu)^2}{2\Lambda} \right)
+p(\beta|\nu,\Lambda) &= \mathcal{N}(\beta; \nu, \Lambda) \nonumber\\
+&= \frac{1}{\sqrt{2 \pi \Lambda}} \exp \left( \frac{ -(\beta - \nu)^2}{2\Lambda} \right) \label{betapdf}
 \end{align}
-The parameters 
+where $\nu$ and $\Lambda$ form hyper-hyperparmeters.
 
-
-
-
-
-
-
-
-
-
-
-
+As stated before, we marginalise our the uncertainty in $\beta$ (or $L$), before fusing the prior with observations. The marginalised kernel is calculated by evaluating the following integral:
+\begin{equation} \label{kernelmargint}
+K_{\nu,\Lambda} = \int_{-\infty}^{+\infty} K_\beta \; p(\beta|\nu,\Lambda) d\beta
+\end{equation}
+which is non-analytic given the current form of $K_\beta$. We approximate the solution to the integral by first approximating $K_\beta$ using a Taylor expansion around the mean of $p(\beta)$ given by $\nu$. In order to make the integral analytic, we would like $K_\beta$ to be in exponential form, hence we note the following identity and substitution:
 \begin{align}
-K_\beta &= \exp \left( -\ln \frac{1}{K_\beta} \right)\\ 
-&= \exp \left( -A \right)
+K_\beta &= \exp \left( -\ln \frac{1}{K_\beta} \right) \nonumber\\ 
+&= \exp \left( -A \right) \label{Asub}
 \end{align}
-
-
+and we Taylor expand around $A$:
 \begin{equation} \label{taylorexpansion}
 A \approx \ln \frac{1}{K_{\beta}}\bigg|_{\nu} + (\beta-\nu) \frac{\partial{A}}{\partial{\beta}}\bigg|_{\nu} + \frac{1}{2}(\beta-\nu)^2 \frac{\partial^2{A}}{\partial^2{\beta}}\bigg|_{\nu}
 \end{equation}
-
-\begin{align}%Probably use this earlier
-K^\prime_\beta &= K_\beta \left( \bigtriangleup^2 \exp(-2\beta)  \right) \\
+Given (\ref{betaSEkernel}), the derivatives of $K_\beta$ can be calculated:
+\begin{align*}
+K^\prime_\beta &= K_\beta \left( \bigtriangleup^2 \exp(-2\beta)  \right) \\ 
 K^{\prime\prime}_\beta &= K_\beta \left( \bigtriangleup^4 \exp(-4\beta) -  \bigtriangleup^2 \exp(-2\beta) \right)
-\end{align}
-
+\end{align*}
+which can be used for calculating the partial derivatives of (\ref{taylorexpansion}):
 \begin{align}
-A &= \ln \frac{1}{K_\beta} \\
-\frac{\partial{A}}{\partial{\beta}} &= -\frac{K^\prime_\beta}{K_\beta} = \; \bigtriangleup^2 \exp(-2\beta)\\
-\frac{\partial^2{A}}{\partial^2{\beta}} &= -\frac{K^{\prime\prime}_\beta}{K_\beta} + \frac{{K^\prime_\beta}^2}{K_\beta^2} = \; 2 \bigtriangleup^2 \exp(-2\beta)
+A &= \ln \frac{1}{K_\beta} \label{partial1}\\
+\frac{\partial{A}}{\partial{\beta}} &= -\frac{K^\prime_\beta}{K_\beta} = \; -\bigtriangleup^2 \exp(-2\beta) \label{partial2}\\
+\frac{\partial^2{A}}{\partial^2{\beta}} &= -\frac{K^{\prime\prime}_\beta}{K_\beta} + \frac{{K^\prime_\beta}^2}{K_\beta^2} = \; 2 \bigtriangleup^2 \exp(-2\beta) \label{partial3}
 \end{align}
-
-$C = \bigtriangleup^2 \exp(-2\nu)$
-
-%... from Taylor Expansion
+Using (\ref{Asub}) and substituting (\ref{partial1}-\ref{partial3}) into (\ref{taylorexpansion}) we arrive at the following expression for $K_\beta$:
 \begin{align}
-K_\beta &\approx \exp \left(-\left( \ln \frac{1}{K_{\nu}} + (\beta-\nu) C + (\beta-\nu)^2 C \right)   \right)\\
-&= K_{\nu} \, \exp \left( (\beta-\nu) C + (\beta-\nu)^2 C \right)
+K_\beta &\approx \exp \left(-\left( \ln \frac{1}{K_{\nu}} - (\beta-\nu) C + (\beta-\nu)^2 C \right)   \right) \nonumber\\
+&= K_{\nu} \, \exp \left( (\beta-\nu) C - (\beta-\nu)^2 C \right) \label{approxkernel}
 \end{align}
+where $C = \bigtriangleup^2 \exp(-2\nu)$
 
-%Marginalising Beta
+All that remains is to evaluate the integral in (\ref{kernelmargint}), which by using (\ref{betapdf}) and (\ref{approxkernel}) is as follows:
 \begin{align}
-K_{\nu,\Lambda} &= \int_{-\infty}^{+\infty} K_\beta \; p(\beta|\nu,\Lambda) d\beta \\
-&= K_{\nu}\int_{-\infty}^{+\infty} \frac{1}{\sqrt{2 \pi \Lambda}} \exp \left( \frac{ -(\beta - \nu)^2}{2\Lambda} \right) \left( (\beta-\nu) C + (\beta-\nu)^2 C \right) \\
+K_{\nu,\Lambda} &\approx K_{\nu}\int_{-\infty}^{+\infty} \frac{1}{\sqrt{2 \pi \Lambda}} \exp \left( \frac{ -(\beta - \nu)^2}{2\Lambda} \right) \left( (\beta-\nu) C - (\beta-\nu)^2 C \right) \nonumber \\
 &= K_{\nu} \; \exp \left( \frac{\Lambda\, C^2}{2(1+2\Lambda C)} \right) \frac{1}{\sqrt{1+ 2\Lambda C}}
 \end{align}
+This result is a new kernel which is the product of the original kernel $K_\beta$ evaluated at $\beta=\nu$, and an expression which is a function of the squared distance $ \bigtriangleup^2$. 
 
 
 
+\subsubsection{Proof of Positive Semi-Definiteness}
 
-
-
-
-
-\subsection{Proof of Positive Semi-Definiteness}
-
-*+*+*+*+ I'll tidy this up!
-
-A sum of kernel is itself a kernel, which by definition fulfils the necessary condition of positive semi-definiteness. Therefore:
+In order to confirm that our new kernel $K_{\nu,\Lambda}$ is a legitimate covariance function, we must prove that it fulfils the necessary condition of kernels which is positive semi-definiteness. We first note that a sum of kernels is also a kernel, therefore:
 \begin{equation}
 K_{\nu,\Lambda} = \int K_\beta \;p(\beta)d\beta
 \end{equation}
-should be a legitimate kernel if $K_\beta$ is also a legitimate kernel as $p(\beta)$ just weights the contents of the integral.
-
-%From above SAME EQUATION!!!! (SO REMOVE LATER)
-\begin{equation}
-K_\beta = K_{\nu} \, \exp \left( (\beta-\nu) C + (\beta-\nu)^2 C \right)
-\end{equation}
-completing the square:
+should be a legitimate kernel if $K_\beta$ is also a legitimate kernel as $p(\beta)$ just weights the contents of the integral. Using the expression for $K_\beta$ in (\ref{approxkernel}) and completing the square we arrive at the following expression:
 \begin{align}
-K_\beta &= K_{\nu} \,  \exp \left(  -\frac{1}{2} (\beta - \nu - 1) ^ 2C   \right) \exp \left( \frac{1}{2}C \right) \\
+K_\beta &= K_{\nu} \,  \exp \left(  -\frac{1}{2} \left( \beta - \nu - \frac{1}{2} \right) ^ 2C   \right) \exp \left( \frac{1}{4}C \right)
 \end{align}
-Product of kernels is also a kernel. Therefore if all three parts of the above equation are kernel, then $K_\beta$ is also a covariance function. First two parts are kernels, the last part isn't. However:
+If we substitute in $K_\nu$, where:
 \begin{align}
-K_{\nu} &= h^2 \exp\left( -\frac{1}{2}\bigtriangleup^2 \exp(-2\nu) \right)\\
-&= h^2 \exp\left( -\frac{C}{2} \right)\\
-K_{\nu} \exp \left( \frac{1}{2}C \right) &= h^2 \exp\left( -\frac{C}{2} \right) \exp \left( \frac{1}{2}C \right) \\
-&= h^2 \exp\left( 0 \right)
+K_{\nu} &= h^2 \exp\left( -\frac{1}{2}\bigtriangleup^2 \exp(-2\nu) \right) \nonumber\\
+&= h^2 \exp\left( -\frac{C}{2} \right)
 \end{align}
-so $K_\beta$ is a kernel.
+we can write:
+\begin{align}
+%K_{\beta} &= h^2 \exp\left( -\frac{C}{2} \right) \,  \exp \left(  -\frac{1}{2} \left( \beta - \nu - \frac{1}{2} \right) ^ 2C   \right) \exp \left( \frac{1}{4}C \right) \nonumber \\
+K_{\beta} = h^2  \exp\left( -\frac{C}{4} \right) \,  \exp \left(  -\frac{1}{2} \left( \beta - \nu - \frac{1}{2} \right) ^ 2C   \right) \label{kexpanded}
+\end{align}
+We note that the product of kernels is also a kernel. Both exponentials in (\ref{kexpanded}) form legitimate kernels, which leaves us with the result that $K_\beta$ is also a kernel and by definition is positive semi-definite as required.
 
-*+*+*+*+ I need to check this, as the result has changed since I did my substitution...
 
 
 
