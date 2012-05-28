@@ -1,5 +1,17 @@
 \begin{thebibliography}{1}
 
+\bibitem{chen2000monte}
+M.H. Chen, Q.M. Shao, and J.G. Ibrahim.
+\newblock {\em Monte Carlo methods in Bayesian computation}.
+\newblock Springer Verlag, 2000.
+
+\bibitem{osbornebayesquad}
+M.A. Osborne, R.~Garnett, S.J. Roberts, C.~Hart, S.~Aigrain, N.P. Gibson, and
+  S.~Aigrain.
+\newblock Bayesian quadrature for ratios.
+\newblock {\em Fifteenth International Conference on Artificial Intelligence
+  and Statistics}, 2012.
+
 \bibitem{rassandwill}
 C.~E. Rasmussen and C.~K.~I. Williams.
 \newblock {\em {Gaussian Processes for Machine Learning}}.
