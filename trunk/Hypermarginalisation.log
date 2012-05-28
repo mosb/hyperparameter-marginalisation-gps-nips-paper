@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2012.1.3)  28 MAY 2012 16:48
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2012.1.3)  28 MAY 2012 16:50
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -236,7 +236,7 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
 Here is how much of TeX's memory you used:
  3032 strings out of 493633
  37596 string characters out of 3143378
- 114283 words of memory out of 3000000
+ 115283 words of memory out of 3000000
  6298 multiletter control sequences out of 15000+200000
  22689 words of font info for 51 fonts, out of 3000000 for 9000
  831 hyphenation exceptions out of 8191
@@ -259,7 +259,7 @@ nts/type1/urw/courier/ucrr8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type
 1/urw/helvetic/uhvb8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw/t
 imes/utmb8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw/times/utmr8
 a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Hypermarginalisation.pdf (4 pages, 175381 bytes).
+Output written on Hypermarginalisation.pdf (4 pages, 175399 bytes).
 PDF statistics:
  86 PDF objects out of 1000 (max. 8388607)
  62 compressed objects within 1 object stream
