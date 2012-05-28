@@ -5,6 +5,8 @@
 \usepackage{amssymb}
 \usepackage{amsfonts}
 \usepackage{bm}
+\usepackage{xcolor}
+\newcommand\jansays[1]{\textcolor{blue}{Jan says: #1}}
 
 \newcommand{\xd}{\mathbf{x}}
 \newcommand{\yd}{\mathbf{y}}
@@ -46,11 +48,11 @@ Steve\\}
 
 %------- ABSTRACT --------
 \begin{abstract}
-Jan wrote;
+\jansays{
 In Bayesian methods a common problem is to choose a prior. In inference with Gaussian processes this task could involve choosing kernel function hyperparameters. In practice however, it is often unclear how to make this choice a priori. Therefore, most implementations deviate from proper Bayesian treatment by estimating the hyperparameters from the data via maximum lmarginal-ikelihood methods. In contrast, we propose to add another hierarchy of inference on top of that. In particular, we propose to place a prior distribution over the hyperparameters. Its hyperparemeters can in turn be estimated learned from the data. Since the resuting integrals of the marginalizations are non-analytic we use a Taylor expansion to yield a Gaussian process which approximates the correct process with marginalized hyperparameters.
 PERHAPS WRITE ABOUT INTEGRAL KERNEL AND RELATION TO RATIONAL QUADRATIC?
 We conduct experiments illustrating the benefits our approach on artificial as well as on real data.
- 
+ }
 \end{abstract}
 
 
@@ -102,7 +104,7 @@ the value of the integrand on a set of sample points, usually via a weighted mix
 \begin{equation}\label{sampling}
 p(f_* |x_*, \yd) \simeq \sum_i \rho_i p(f_* | x_*, \yd,\bm{\theta}_i)
 \end{equation}
-for some weight vector $\bm{\rho}$. Unfortunately, the computational expense of evaluating the integrand at sufficient samples to estimate high-dimensional integrals is often prohibitive. As a consequence, such approaches are rarely used for the marginalisation of \verb"GP" hyperparameters. 
+for some weight vector $\bm{\rho}$. Unfortunately, the computational expense of evaluating the integrand at sufficient samples to estimate high-dimensional integrals is often prohibitive. As a consequence, such approaches are rarely used for the marginalisation of \verb"GP" hyperparameters. \jansays{IS THIS CORRECT? OR, IS IT BECAUSE IT IS HARD  TO SPECIFY A PRIOR AND SINCE PEOPLE ARE LAZY ?}
 
 A less computationally demanding alternative is to select only a single sample. Type II maximum likelihood, or maximum marginal likelihood, approximates as
 \begin{equation} \label{eq:ML}
@@ -132,9 +134,18 @@ K_\theta(x,x^\prime) = h^2 \exp \left( -\frac{1}{2} \frac{\bigtriangleup^2}{L^2}
 \end{equation}
 where $\bigtriangleup^2 = (x - x^\prime)^2$, and $h$ is a scaling parameter termed the output scale. The parameter $L$, the \emph{length scale}, affects how closely points co-vary as a function of $\bigtriangleup^2$. The length parameter is perhaps the most crucial hyperparameter to train correctly, and is where we begin our exposition.
 
+\jansays{ COULD WE NOT BE MORE GENERAL SAYING:  
+We assume our GP prior is endowed with a kernel function of the form 
+\begin{equation}
+K_\theta(x,x^\prime) = h^2 \exp \left( -\frac{1}{2} \frac{d(x,x')}{L^2} \right)
+\end{equation}
+where $d$ is an arbitrary function. Typically, $d$ will be a distance metric. For instance, choosing $d(x,x') = x M x'$ for a pos. def. matrix $M$ yields the squared exponential kernel. Or, $d(x,x') = |x-x'|$ gives rise to the Ornstein-Uhlenbeck kernel.
+... this should not affect our derivations below..}
+
 \subsubsection{Incorporating Uncertainty}
 
-The standard \verb"GP" prior assumes that the value of $L$ is deterministic; any distribution an individual has over $L$ is purely the epistemic characterisation of their uncertainty in the `true' value of $L$. We alter the prior such that we make $L$ a random variable with its own generative distribution $p(L)$. The value of $L$ should be strictly positive, hence we make the substitution $L=exp(\beta)$ and define a Gaussian distribution over $\beta$ so that $p(L)$ will have strictly positive support: 
+
+The standard \verb"GP" prior assumes that the value of $L$ is deterministic; any distribution an individual has over $L$ is purely the epistemic characterisation of their uncertainty in the `true' value of $L$. We alter the prior such that we make $L$ a random variable with its own generative distribution $p(L)$. The value of $L$ should be strictly positive \jansays{no the way you defined it above L can be anything. Maybe should def $\exp(-\Delta^2 / L)$ instead of .../$L^2$.. this was the way we used to do it in February}, hence we make the substitution $L=\exp(\beta)$ \jansays{$\beta := \log(L)$ } and define a Gaussian distribution over $\beta$ so that $p(L)$ will have strictly positive support: 
 \begin{equation}\label{betaSEkernel}
 K_\theta(x,x^\prime) = h^2 \exp \left( -\frac{1}{2}\bigtriangleup^2 \exp(-2\beta) \right)
 \end{equation}
@@ -145,7 +156,11 @@ p(\beta|\nu,\Lambda) &= \mathcal{N}(\beta; \nu, \Lambda) \nonumber\\
 \end{align}
 where $\nu$ and $\Lambda$ form hyper-hyperparmeters.
 
-As stated before, we marginalise our the uncertainty in $\beta$ (or $L$), before fusing the prior with observations. The marginalised kernel is calculated by evaluating the following integral:
+As stated before, we marginalise our the uncertainty in $\beta$ (or $L$), before fusing the prior with observations. 
+
+\jansays{Perhaps we should talk about the moment matching idea first.. As far as I can remember: Ie taylor expand the marginalized process ... it then turns out the the kernel of the matched process equals the marginalized kernel you write down in (14) below..}
+
+The marginalised kernel is calculated by evaluating the following integral:
 \begin{equation} \label{kernelmargint}
 K_{\nu,\Lambda} = \int_{-\infty}^{+\infty} K_\beta \; p(\beta|\nu,\Lambda) d\beta
 \end{equation}
