@@ -65,7 +65,7 @@ We conduct experiments illustrating the benefits our approach on artificial as w
 Gaussian processes (\verb"GPs") constitute a powerful method for performing Bayesian inference about functions using a limited set of observations \cite{rassandwill}. A \verb"GP" is defined as a distribution over the functions $f : \mathcal{X} \rightarrow \mathbb{R}$ such that the distribution over the possible function values on any finite set of $\mathcal{X}$ is multi-variate Gaussian. A vector of observations $\mathbf{y} = \{ y_1,...,y_n\}$ could be viewed as a single point sampled from a $n$-variate Gaussian distribution.
 %One can imagine a point $x_i \in \mathcal{X}$ as having an associated random variable $Y_i$ representing the possible values the function can take at that point, the \verb"GP" is therefore the infinite set of such random variables defined across the domain of the function. If we take a sample from a \verb"GP" at a finite set of input locations $\mathbf{x} = \{x_1,...,x_n\}$, the corresponding observations $\mathbf{y} = \{ y_1,...,y_n\}$ can be viewed as a single point sampled from some multi-variate Gaussian distribution.
 
-A \verb"GP" is completely defined by its first and second moments: a mean function $\mu : \mathcal{X} \rightarrow \mathbb{R}$, which describes the overall trend of the function, and a positive semidefinite covariance function $K : \mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}$ which describes how function values are correlated as a function of their locations in the domain. Given a function $f : \mathcal{X} \rightarrow \mathbb{R}$ about which we wish to perform inference and a set of input points $\mathbf{x} \subseteq \mathcal{X}$, the Gaussian process prior distribution over the function values $\mathbf{f} = f(\mathbf{x})$ is given by:
+A \verb"GP" is completely defined by its first and second moments: a mean function $\mu : \mathcal{X} \rightarrow \mathbb{R}$, which describes the overall trend of the function, and a positive semidefinite covariance function, or kernel, $K : \mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}$ which describes how function values are correlated as a function of their locations in the domain. Given a function $f : \mathcal{X} \rightarrow \mathbb{R}$ about which we wish to perform inference and a set of input points $\mathbf{x} \subseteq \mathcal{X}$, the Gaussian process prior distribution over the function values $\mathbf{f} = f(\mathbf{x})$ is given by:
 \begin{align}
 p(\mathbf{f} | \mathbf{x},\bm{\theta},I) &:= \mathcal{N}\left( \mathbf{f};\mu_\theta(\mathbf{x}),K_\theta(\mathbf{x},\mathbf{x}) \right) \\
 &:= \frac{1}{\sqrt{\mathrm{det} 2 \pi K_{\mathbf{f}}} } \exp \left( - \frac{1}{2} (\mathbf{f}-\mu_{\mathbf{f}})^\top K_\mathbf{f}^{-1} (\mathbf{f}-\mu_{\mathbf{f}})  \right)
@@ -122,27 +122,39 @@ As per Figure ****, \eqref{eq:ML} is equivalent to approximating the likelihood 
 %------- APPROXIMATE HYPERPARAMETER MARGINALISATION --------
 \section{Approximate Hyperparameter Marginalisation}
 
-In this section we introduce an approximate method for performing inference using a Gaussian Process which accommodates the inherent uncertainty one should have about the value of hyperparameters, but which does not suffer from excessive computational expense. Rather than attempt to approximate the integral in (\ref{fullmargint}), we present a philosophical shift away from the standard \verb"GP" prior opting instead to develop a new prior which incorporates and marginalises the uncertainty in the hyperparameters \emph{before} fusing the prior with observations. The result is an adjusted covariance function which can be used interchangeably with a standard covariance function in \verb"GP" inference, but whose parameters are now \emph{hyper-hyperparameters} explaining the marginalised covariance function.
+In this section we introduce an approximate method for performing inference using a Gaussian process which accommodates the inherent uncertainty one should have about the value of hyperparameters, but which does not suffer from excessive computational expense. Rather than attempt to approximate the integral in (\ref{fullmargint}), we present a philosophical shift away from the standard \verb"GP" prior opting instead to develop a modified prior which incorporates and marginalises the uncertainty in the hyperparameters \emph{before} it is fused with observations. The result is an adjusted covariance function which can be used interchangeably with a standard covariance function in \verb"GP" inference, but whose parameters are now \emph{hyper-hyperparameters} explaining the marginalised covariance function.
 
-\subsection{The Squared Exponential Covariance Function}
+\subsection{The Squared Exponential Kernel}
 
-One of the most pervasive covariance functions used in Bayesian inference is the \emph{Squared Exponential}, or \emph{Gaussian} kernel:
-\begin{align}
-K(x,x^\prime) = 
-\end{align}
+As is the case in standard \verb"GP" inference, a prior covariance function must be selected which is representative of any prior belief about the function of interest. In order to develop our method we first look at one of the most pervasive covariance functions used in Bayesian inference: the \emph{Squared Exponential}, or \emph{Gaussian}, kernel:
+\begin{equation}
+K_\theta(x,x^\prime) = h^2 \exp \left( -\frac{1}{2} \frac{\bigtriangleup^2}{L^2} \right)
+\end{equation}
+where $\bigtriangleup^2 = (x - x^\prime)^2$, and $h$ is a scaling parameter termed the output scale. The parameter $L$, the \emph{length scale}, affects how closely points co-vary as a function of $\bigtriangleup^2$. The length parameter is perhaps the most crucial hyperparameter to train correctly, and is where we begin our exposition.
 
+\subsubsection{Incorporating Uncertainty}
 
-
-
-
-
-
-$L = \exp(\beta)$
-
+The standard \verb"GP" prior assumes that the value of $L$ is deterministic; any distribution an individual has over $L$ is purely the epistemic characterisation of their uncertainty in the `true' value of $L$. We alter the prior such that we make $L$ a random variable with its own generative distribution $p(L)$. The value of $L$ should be strictly positive, hence we make the substitution $L=exp(\beta)$ and define a Gaussian distribution over $\beta$ so that $p(L)$ will have strictly positive support: 
+\begin{equation}
+K_\theta(x,x^\prime) = h^2 \exp \left( -\frac{1}{2}\bigtriangleup^2 \exp(-2\beta) \right)
+\end{equation}
+which we will write as $K_\beta$, and
 \begin{align}
 p(\beta|\nu,\Lambda) &= \mathcal{N}(\beta; \nu, \Lambda)\\
 &= \frac{1}{\sqrt{2 \pi \Lambda}} \exp \left( \frac{ -(\beta - \nu)^2}{2\Lambda} \right)
 \end{align}
+The parameters 
+
+
+
+
+
+
+
+
+
+
+
 
 \begin{align}
 K_\beta &= \exp \left( -\ln \frac{1}{K_\beta} \right)\\ 
@@ -155,7 +167,6 @@ A \approx \ln \frac{1}{K_{\beta}}\bigg|_{\nu} + (\beta-\nu) \frac{\partial{A}}{\
 \end{equation}
 
 \begin{align}%Probably use this earlier
-K_\beta &= h^2 \exp\left( -\frac{1}{2}\bigtriangleup^2 \exp(-2\beta) \right)\\
 K^\prime_\beta &= K_\beta \left( \bigtriangleup^2 \exp(-2\beta)  \right) \\
 K^{\prime\prime}_\beta &= K_\beta \left( \bigtriangleup^4 \exp(-4\beta) -  \bigtriangleup^2 \exp(-2\beta) \right)
 \end{align}
