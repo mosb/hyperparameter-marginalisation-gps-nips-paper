@@ -8,6 +8,8 @@
 \usepackage{xcolor}
 \newcommand\jansays[1]{\textcolor{blue}{Jan says: #1}}
 
+\newcommand\mikesays[1]{\colorbox{yellow}{\parbox{\columnwidth}{Mike says: #1}}}
+
 \newcommand{\xd}{\mathbf{x}}
 \newcommand{\yd}{\mathbf{y}}
 
@@ -48,18 +50,21 @@ Steve\\}
 
 %------- ABSTRACT --------
 \begin{abstract}
-\jansays{
-In Bayesian methods a common problem is to choose a prior. In inference with Gaussian processes this task could involve choosing kernel function hyperparameters. In practice however, it is often unclear how to make this choice a priori. Therefore, most implementations deviate from proper Bayesian treatment by estimating the hyperparameters from the data via maximum lmarginal-ikelihood methods. In contrast, we propose to add another hierarchy of inference on top of that. In particular, we propose to place a prior distribution over the hyperparameters. Its hyperparemeters can in turn be estimated learned from the data. Since the resuting integrals of the marginalizations are non-analytic we use a Taylor expansion to yield a Gaussian process which approximates the correct process with marginalized hyperparameters.
-PERHAPS WRITE ABOUT INTEGRAL KERNEL AND RELATION TO RATIONAL QUADRATIC?
-We conduct experiments illustrating the benefits our approach on artificial as well as on real data.
- }
+Kernel and covariance functions are often parameterised by hyperparameters, unknown {\it a-priori}. We propose a novel means of approximately integrating over these hyperparameters. This approach gives rise to a novel class of covariance functions which are robust to hyperparameter uncertainty, avoiding the over-fitting that often accompanies type-II maximum-likelihood fitting of the hyperparameters. We demonstrate the efficacy of our covariances for Gaussian process regression on both synthetic and real data.
+% \jansays{In Bayesian methods a common problem is to choose a prior. In inference with Gaussian processes this task could involve choosing kernel function hyperparameters. In practice however, it is often unclear how to make this choice a priori. Therefore, most implementations deviate from proper Bayesian treatment by estimating the hyperparameters from the data via maximum lmarginal-ikelihood methods. In contrast, we propose to add another hierarchy of inference on top of that. In particular, we propose to place a prior distribution over the hyperparameters. Its hyperparemeters can in turn be estimated learned from the data. Since the resuting integrals of the marginalizations are non-analytic we use a Taylor expansion to yield a Gaussian process which approximates the correct process with marginalized hyperparameters.
+% PERHAPS WRITE ABOUT INTEGRAL KERNEL AND RELATION TO RATIONAL QUADRATIC?
+% We conduct experiments illustrating the benefits our approach on artificial as well as on real data.}
 \end{abstract}
 
 
 %------- INTRODUCTION--------
 \section{Introduction}
 
+Kernels and covariances are vital to much of Machine Learning. 
 
+The hyperparameters of such functions are rarely known {\it a-priori}. This is particularly important when we have small amounts of data, important for applications where obtaining data is expensive (computationally or otherwise).
+
+Hyperparameters are often set by type-II maximum likelihood. Monte Carlo is too expensive. We introduce a Laplace approximation. This gives us a robust family of covariances that are tolerant to uncertainty in the hyperparameters. 
 
 %------- GAUSSIAN PROCESSES--------
 \section{Gaussian Processes}
@@ -104,7 +109,9 @@ the value of the integrand on a set of sample points, usually via a weighted mix
 \begin{equation}\label{sampling}
 p(f_* |x_*, \yd) \simeq \sum_i \rho_i p(f_* | x_*, \yd,\bm{\theta}_i)
 \end{equation}
-for some weight vector $\bm{\rho}$. Unfortunately, the computational expense of evaluating the integrand at sufficient samples to estimate high-dimensional integrals is often prohibitive. As a consequence, such approaches are rarely used for the marginalisation of \verb"GP" hyperparameters. \jansays{IS THIS CORRECT? OR, IS IT BECAUSE IT IS HARD  TO SPECIFY A PRIOR AND SINCE PEOPLE ARE LAZY ?}
+for some weight vector $\bm{\rho}$. Unfortunately, the computational expense of evaluating the integrand at sufficient samples to estimate high-dimensional integrals is often prohibitive. As a consequence, such approaches are rarely used for the marginalisation of \verb"GP" hyperparameters. 
+%\jansays{IS THIS CORRECT? OR, IS IT BECAUSE IT IS HARD  TO SPECIFY A PRIOR AND SINCE PEOPLE ARE LAZY ?}
+% you're not going to win people over by calling them lazy
 
 A less computationally demanding alternative is to select only a single sample. Type II maximum likelihood, or maximum marginal likelihood, approximates as
 \begin{equation} \label{eq:ML}
@@ -119,20 +126,39 @@ where $\bm{\theta}_{\mathrm{ML}}$ is the hyperparameter vector that maximises th
 \end{equation}
 As per Figure ****, \eqref{eq:ML} is equivalent to approximating the likelihood $p(\yd|\xd,\bm{\theta})$ as the delta function $\delta(\theta - \theta_{\mathrm{ML}})$. This assumption is a poor representation of our true state of ignorance given only low numbers of data, for which the likelihood is typically broad and/or multi-modal. As a consequence, type II maximum likelihood can often lead to over-fitting. Nonetheless, the less onerous computational requirements of this approach have made it ubiquitous throughout machine learning. 
 
-*+*+*+*+*+*+*+ TEXT NEEDED!!! - Insert comment about what our paper does as a gap between the two methods just discussed *+*+*+*+*+*+*+*+
+We now present a novel means of marginalising hyperparam
 
 %------- APPROXIMATE HYPERPARAMETER MARGINALISATION --------
 \section{Approximate Hyperparameter Marginalisation}
 
 In this section we introduce an approximate method for performing inference using a Gaussian process which accommodates the inherent uncertainty one should have about the value of hyperparameters, but which does not suffer from excessive computational expense. Rather than attempt to approximate the integral in (\ref{fullmargint}), we present a philosophical shift away from the standard \verb"GP" prior opting instead to develop a modified prior which incorporates and marginalises the uncertainty in the hyperparameters \emph{before} it is fused with observations. The result is an adjusted covariance function which can be used interchangeably with a standard covariance function in \verb"GP" inference, but whose parameters are now \emph{hyper-hyperparameters} explaining the marginalised covariance function.
 
-\subsection{The Squared Exponential Kernel}
+\subsection{Homogenous Exponential Covariance Functions} \mikesays{this section defines the general class of covariance functions our method is appropriate to, which we can call Homogenous Exponential covariance functions}
 
 As is the case in standard \verb"GP" inference, a prior covariance function must be selected which is representative of any prior belief about the function of interest. In order to develop our method we first look at one of the most pervasive covariance functions used in Bayesian inference: the \emph{Squared Exponential}, or \emph{Gaussian}, kernel:
 \begin{equation}
 K_\theta(x,x^\prime) = h^2 \exp \left( -\frac{1}{2} \frac{\bigtriangleup^2}{L^2} \right)
 \end{equation}
 where $\bigtriangleup^2 = (x - x^\prime)^2$, and $h$ is a scaling parameter termed the output scale. The parameter $L$, the \emph{length scale}, affects how closely points co-vary as a function of $\bigtriangleup^2$. The length parameter is perhaps the most crucial hyperparameter to train correctly, and is where we begin our exposition.
+
+\mikesays{We can also say that marginalising the output scale can be done
+analytically with an inverse-gamma prior on the squared output scale,
+but then we would no longer have a GP, which would kind of defeat the
+point. Alternatively, you can use our approach to approximately
+marginalise the output scale h by resolving
+$int h^2 K(x, x') p(h) dh$
+where $K(x, x')$ is a normalised cov fn. Taking a Gamma prior for $h^-2$,
+rather than a Gaussian for  $log h$, is a sensible thing to do here as,
+with reference to the previous plots, we'd rather favour infinite
+output scale over zero output scale as we get more and more uncertain.
+That is, if we have no idea of the output scale at all, it seems
+unreasonable for us to expect most of the data to be within epsilon of
+the prior mean. With a Gamma prior for $h^-2$ with mean $mu_h$ and shape
+parameter $a_h$, our integral resolves to
+$a_h Gamma(-1 + a_h) / (mu_h Gamma(a_h) ) K(x, x')$
+where Gamma is the Gamma function. So basically we just replace the
+squared output scale of our covariance function with $a_h Gamma(-1 +
+a_h) / (mu_h Gamma(a_h) )$ and we're done. This trick has been done by previous authors- I can chase up references.}
 
 \jansays{ COULD WE NOT BE MORE GENERAL SAYING:  
 We assume our GP prior is endowed with a kernel function of the form 
@@ -142,7 +168,11 @@ K_\theta(x,x^\prime) = h^2 \exp \left( -\frac{1}{2} \frac{d(x,x')}{L^2} \right)
 where $d$ is an arbitrary function. Typically, $d$ will be a distance metric. For instance, choosing $d(x,x') = x M x'$ for a pos. def. matrix $M$ yields the squared exponential kernel. Or, $d(x,x') = |x-x'|$ gives rise to the Ornstein-Uhlenbeck kernel.
 ... this should not affect our derivations below..}
 
-\subsubsection{Incorporating Uncertainty}
+\subsection{Rational Quadratic Covariance Function} 
+
+The Rational Quadratic covariance funciton represents one means of approximately marginalising the input scale of a squared exponential covariance. It assumes a gamma prior, which, problematically, puts excessive weight on very lagre input scales when we are very uncertain. See Figures ***** \mikesays{ Mike will make these figures}.
+
+\subsection{Marginal Homogenous Exponential Covariance Function} \mikesays{now we talk about our covariance, which I've called Marginal Homogenous Exponential covariances}
 
 
 The standard \verb"GP" prior assumes that the value of $L$ is deterministic; any distribution an individual has over $L$ is purely the epistemic characterisation of their uncertainty in the `true' value of $L$. We alter the prior such that we make $L$ a random variable with its own generative distribution $p(L)$. The value of $L$ should be strictly positive \jansays{no the way you defined it above L can be anything. Maybe should def $\exp(-\Delta^2 / L)$ instead of .../$L^2$.. this was the way we used to do it in February}, hence we make the substitution $L=\exp(\beta)$ \jansays{$\beta := \log(L)$ } and define a Gaussian distribution over $\beta$ so that $p(L)$ will have strictly positive support: 
@@ -234,7 +264,8 @@ We note that the product of kernels is also a kernel. Both exponentials in (\ref
 
 
 %------- RELATED WORK --------
-\section{Related Work}
+%\section{Related Work} 
+% \mjikesays{no need for this particularly, I don't think; we can cover related work above}
 
 
 
@@ -245,8 +276,9 @@ We note that the product of kernels is also a kernel. Both exponentials in (\ref
 
 
 %---------ACKNOWLEDGEMENTS-----------
-\subsubsection*{Acknowledgments}
-Do we have any? Aladdin / Orchid?
+% \subsubsection*{Acknowledgments}
+% Do we have any? Aladdin / Orchid?
+% no acknowledgements in double-blind submission
 
 
 %------------REFERENCES----------------
