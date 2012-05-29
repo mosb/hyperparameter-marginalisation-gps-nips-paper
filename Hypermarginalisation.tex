@@ -173,30 +173,32 @@ where $d$ is an arbitrary function. Typically, $d$ will be a distance metric. Fo
 
 \subsection{Rational Quadratic Covariance Function} 
 
-The Rational Quadratic covariance funciton represents one means of approximately marginalising the input scale of a squared exponential covariance. It assumes a gamma prior, which, problematically, puts excessive weight on very lagre input scales when we are very uncertain. See Figures ***** \mikesays{ Mike will make these figures}.
+The Rational Quadratic covariance funciton represents one means of approximately marginalising the input scale of a squared exponential covariance. It assumes a gamma prior, which, problematically, puts excessive weight on very lagre input scales when we are very uncertain. See Figure \ref{fig:rq_vs_our_cov}.
 
 \begin{figure}
 	\begin{subfigure}[b]{7cm}
 		\psfragfig[height = 2cm, width = 7cm]{figures/gamma_prior}
-		\caption{}
-		\label{fig:integrate_hypers}
+		\caption{Gamma prior distributions for $1/L^2$}
+		\label{fig:gamma_prior}
 	\end{subfigure}
 	\begin{subfigure}[b]{7cm}
 		\psfragfig[height = 2cm, width = 7cm]{figures/log_normal_prior}
-		\caption{}
-		 \label{fig:eue}
+		\caption{Gaussian prior distributions for $\log(L)$}
+		 \label{fig:log_normal_prior}
 	\end{subfigure}
- \\
+ \\[0.2cm]
 	\begin{subfigure}[b]{7cm}
 		\psfragfig[height = 2cm, width = 7cm]{figures/RQ_cov}
-		\caption{}
-		\label{fig:integrate_hypers}
+		\caption{Rational quadratic covariances}
+		\label{fig:RQ_cov}
 	\end{subfigure}
 	\begin{subfigure}[b]{7cm}
 		\psfragfig[height = 2cm, width = 7cm]{figures/our_cov}
-		\caption{}
-		 \label{fig:eue}
+		\caption{Marginal homogenous exponential covariances}
+		 \label{fig:our_cov}
 	\end{subfigure}
+\caption{All figures have $\nu = 1$ and share the legends of \subref{fig:gamma_prior}) and \subref{fig:our_cov}).}
+\label{fig:rq_vs_our_cov}
 \end{figure}
 
 
