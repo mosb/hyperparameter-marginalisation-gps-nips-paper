@@ -6,8 +6,11 @@
 \usepackage{amsfonts}
 \usepackage{bm}
 \usepackage{xcolor}
+\usepackage{caption}
+\usepackage{subcaption} 
+\usepackage{pstool}
+\usepackage{psfrag}
 \newcommand\jansays[1]{\textcolor{blue}{Jan says: #1}}
-
 \newcommand\mikesays[1]{\colorbox{yellow}{\parbox{\columnwidth}{Mike says: #1}}}
 
 \newcommand{\xd}{\mathbf{x}}
@@ -171,6 +174,31 @@ where $d$ is an arbitrary function. Typically, $d$ will be a distance metric. Fo
 \subsection{Rational Quadratic Covariance Function} 
 
 The Rational Quadratic covariance funciton represents one means of approximately marginalising the input scale of a squared exponential covariance. It assumes a gamma prior, which, problematically, puts excessive weight on very lagre input scales when we are very uncertain. See Figures ***** \mikesays{ Mike will make these figures}.
+
+\begin{figure}
+	\begin{subfigure}[b]{7cm}
+		\psfragfig[height = 2cm, width = 7cm]{figures/gamma_prior}
+		\caption{}
+		\label{fig:integrate_hypers}
+	\end{subfigure}
+	\begin{subfigure}[b]{7cm}
+		\psfragfig[height = 2cm, width = 7cm]{figures/log_normal_prior}
+		\caption{}
+		 \label{fig:eue}
+	\end{subfigure}
+ \\
+	\begin{subfigure}[b]{7cm}
+		\psfragfig[height = 2cm, width = 7cm]{figures/RQ_cov}
+		\caption{}
+		\label{fig:integrate_hypers}
+	\end{subfigure}
+	\begin{subfigure}[b]{7cm}
+		\psfragfig[height = 2cm, width = 7cm]{figures/our_cov}
+		\caption{}
+		 \label{fig:eue}
+	\end{subfigure}
+\end{figure}
+
 
 \subsection{Marginal Homogenous Exponential Covariance Function} \mikesays{now we talk about our covariance, which I've called Marginal Homogenous Exponential covariances}
 
