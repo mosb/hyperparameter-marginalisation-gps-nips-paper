@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2011.11.30)  29 MAY 2012 17:53
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2011.11.30)  29 MAY 2012 18:06
 entering extended mode
  %&-line parsing enabled.
 **Hypermarginalisation.tex
@@ -243,20 +243,7 @@ File: xkeyval.tex 2008/08/13 v2.6a key=value parser (HA)
 ))
 \pstool@out=\write4
 )
-(./Hypermarginalisation.aux
-
-LaTeX Warning: Label `fig:integrate_hypers' multiply defined.
-
-
-LaTeX Warning: Label `sub@fig:integrate_hypers' multiply defined.
-
-
-LaTeX Warning: Label `fig:eue' multiply defined.
-
-
-LaTeX Warning: Label `sub@fig:eue' multiply defined.
-
-)
+(./Hypermarginalisation.aux)
 \openout1 = `Hypermarginalisation.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 49.
@@ -272,7 +259,8 @@ LaTeX Font Info:    ... okay on input line 49.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 49.
 LaTeX Font Info:    ... okay on input line 49.
 LaTeX Font Info:    Try loading font information for OT1+ptm on input line 49.
- (/usr/share/texmf-texlive/tex/latex/psnfss/ot1ptm.fd
+
+(/usr/share/texmf-texlive/tex/latex/psnfss/ot1ptm.fd
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 )
 ABD: EveryShipout initializing macros
@@ -311,35 +299,6 @@ Overfull \hbox (6.0pt too wide) in paragraph at lines 164--165
 [][][][][][][] 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 176--177
-\OT1/ptm/m/n/10 The Ra-tio-nal Quadratic co-vari-ance funci-ton rep-re-sents on
-e means of ap-prox-i-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 176--177
-\OT1/ptm/m/n/10 mately marginal-is-ing the in-put scale of a squared ex-po-nen-
-tial co-vari-ance. It
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 176--177
-\OT1/ptm/m/n/10 as-sumes a gamma prior, which, prob-lem-at-i-cally, puts ex-ces
--sive weight on
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 176--177
-\OT1/ptm/m/n/10 very la-gre in-put scales when we are very un-cer-tain. See Fig
--ures *****
- []
-
-
-Overfull \hbox (8.5pt too wide) in paragraph at lines 176--177
-[][][][][][]\OT1/ptm/m/n/10 . 
- []
-
 (./figures/gamma_prior.tex)
 File: figures/gamma_prior.eps Graphic file (type eps)
  <figures/gamma_prior.eps>
@@ -362,22 +321,18 @@ Overfull \hbox (2.7536pt too wide) in paragraph at lines 179--200
  []
 
 
-Overfull \hbox (6.0pt too wide) in paragraph at lines 203--204
+Overfull \hbox (6.0pt too wide) in paragraph at lines 205--206
 [][][][][][] 
  []
 
-[3] [4] (./Hypermarginalisation.bbl [5]) [6] (./Hypermarginalisation.aux)
-
-LaTeX Warning: There were multiply-defined labels.
-
- ) 
+[3] [4] (./Hypermarginalisation.bbl) [5] (./Hypermarginalisation.aux) ) 
 Here is how much of TeX's memory you used:
- 4131 strings out of 495062
- 56837 string characters out of 1182643
- 132277 words of memory out of 3000000
- 7219 multiletter control sequences out of 15000+50000
- 13544 words of font info for 42 fonts, out of 3000000 for 9000
+ 4168 strings out of 495062
+ 57260 string characters out of 1182643
+ 133280 words of memory out of 3000000
+ 7243 multiletter control sequences out of 15000+50000
+ 18492 words of font info for 60 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
  40i,11n,90p,860b,598s stack positions out of 5000i,500n,10000p,200000b,50000s
 
-Output written on Hypermarginalisation.dvi (6 pages, 37820 bytes).
+Output written on Hypermarginalisation.dvi (5 pages, 37284 bytes).
