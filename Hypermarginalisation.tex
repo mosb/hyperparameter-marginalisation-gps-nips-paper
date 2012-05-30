@@ -299,8 +299,7 @@ When using standard kernels, functions drawn from the prior will have a fixed le
 
 We demonstrate the above behaviour and its advantage over other methods in this section. We begin by drawing a function from a prior \verb"GP" with known length scale. From this we can generate a training set of between $X$ and $X$ observations in the domain $\mathcal{X}\in [-3,3]$. We train the hyperparameters or hyper-hyperparameters of our test methods using type-II maximum likelihood on the given training set. Now we go back to the original \verb"GP" and draw a set of $X$ functions from the posterior (so that the functions still go through the original training data) with length scales ranging from $X$ to $X$. An example training set and resulting set of posterior functions can be seen in figure XXXX. A test set with $100$ observations is generated from each function and a log likelihood is calculated for each method. This process is repeated with $100$ different starting functions and training data.
 
-We plot the log length scale (of the posterior function) against the likelihood of the data for each method.
-
+We plot the mean and variance trials of the likelihood of the test data across all $X*100$ against the log length scale of the posterior function.
 
 
 
