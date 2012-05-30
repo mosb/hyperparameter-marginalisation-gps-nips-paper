@@ -72,7 +72,7 @@ Hyperparameters are often set by type-II maximum likelihood. Monte Carlo is too 
 %------- GAUSSIAN PROCESSES--------
 \section{Gaussian Processes}
 
-Gaussian processes (\verb"GPs") constitute a powerful method for performing Bayesian inference about functions using a limited set of observations \cite{rassandwill}. A \verb"GP" is defined as a distribution over the functions $f : \mathcal{X} \rightarrow \mathbb{R}$ such that the distribution over the possible function values on any finite set of $\mathcal{X}$ is multi-variate Gaussian. A vector of observations $\mathbf{y} = \{ y_1,...,y_n\}$ could be viewed as a single point sampled from a $n$-variate Gaussian distribution.
+Gaussian processes (\verb"GPs") constitute a powerful method for performing Bayesian inference about functions using a limited set of observations \cite{rassandwill}. A \verb"GP" is defined as a distribution over the functions $f : \mathcal{X} \rightarrow \mathbb{R}$ such that the distribution over the possible function values on any finite set of $\mathcal{X}$ is multi-variate Gaussian.
 %One can imagine a point $x_i \in \mathcal{X}$ as having an associated random variable $Y_i$ representing the possible values the function can take at that point, the \verb"GP" is therefore the infinite set of such random variables defined across the domain of the function. If we take a sample from a \verb"GP" at a finite set of input locations $\mathbf{x} = \{x_1,...,x_n\}$, the corresponding observations $\mathbf{y} = \{ y_1,...,y_n\}$ can be viewed as a single point sampled from some multi-variate Gaussian distribution.
 
 A \verb"GP" is completely defined by its first and second moments: a mean function $\mu : \mathcal{X} \rightarrow \mathbb{R}$, which describes the overall trend of the function, and a positive semidefinite covariance function, or kernel, $K : \mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}$ which describes how function values are correlated as a function of their locations in the domain. Given a function $f : \mathcal{X} \rightarrow \mathbb{R}$ about which we wish to perform inference and a set of input points $\mathbf{x} \subseteq \mathcal{X}$, the Gaussian process prior distribution over the function values $\mathbf{f} = f(\mathbf{x})$ is given by:
@@ -85,7 +85,7 @@ There exist a wide variety of mean and covariance functions which can be chosen 
 %Note also that we need not place a \verb"GP" directly on the function, for example a function known to be strictly positive might benefit from a \verb"GP" over its logarithm.
 
 %Observations
-Once we have observations of the function $(\mathbf{x_s},\yd)$ we can make predictions about the function value $f_*$ at input $x_*$. As exact measurements of the function are often not available we assume a noise model, such that:
+A vector of observations $\mathbf{y} = \{ y_1,...,y_n\}$ could be viewed as a single point sampled from a $n$-variate Gaussian distribution. Once we have observations of the function $(\mathbf{x_s},\yd)$ we can make predictions about the function value $f_*$ at input $x_*$. As exact measurements of the function are often not available we assume a noise model, such that:
 \begin{equation}\label{obsnoise}
 p(y | f, x, \sigma_n^2) := \mathcal{N}(y; f, \sigma_n^2)
 \end{equation} 
@@ -112,7 +112,7 @@ the value of the integrand on a set of sample points, usually via a weighted mix
 \begin{equation}\label{sampling}
 p(f_* |x_*, \yd) \simeq \sum_i \rho_i p(f_* | x_*, \yd,\bm{\theta}_i)
 \end{equation}
-for some weight vector $\bm{\rho}$. Unfortunately, the computational expense of evaluating the integrand at sufficient samples to estimate high-dimensional integrals is often prohibitive. As a consequence, such approaches are rarely used for the marginalisation of \verb"GP" hyperparameters. 
+for some weight vector $\bm{\rho}$. Unfortunately, the computational expense of evaluating the integrand at sufficient samples to estimate high-dimensional integrals is often prohibitive. %As a consequence, such approaches are rarely used for the marginalisation of \verb"GP" hyperparameters. 
 %\jansays{IS THIS CORRECT? OR, IS IT BECAUSE IT IS HARD  TO SPECIFY A PRIOR AND SINCE PEOPLE ARE LAZY ?}
 % you're not going to win people over by calling them lazy
 
@@ -125,7 +125,7 @@ p(f_* |x_*, \yd) \simeq p(f_* | x_*, \yd,\bm{\theta}_{\mathrm{ML}})
 %\end{equation}
 where $\bm{\theta}_{\mathrm{ML}}$ is the hyperparameter vector that maximises the marginal likelihood, 
 \begin{equation}
-\bm{\theta}_{\mathrm{ML}} = \argmax_{\bm{\theta}} \;\; p(\yd|\xd,\bm{\theta})\,.
+\bm{\theta}_{\mathrm{ML}} = \argmax_{\bm{\theta}} \;\; p(\yd|\xd,\bm{\theta})
 \end{equation}
 As per Figure ****, \eqref{eq:ML} is equivalent to approximating the likelihood $p(\yd|\xd,\bm{\theta})$ as the delta function $\delta(\theta - \theta_{\mathrm{ML}})$. This assumption is a poor representation of our true state of ignorance given only low numbers of data, for which the likelihood is typically broad and/or multi-modal. As a consequence, type II maximum likelihood can often lead to over-fitting. Nonetheless, the less onerous computational requirements of this approach have made it ubiquitous throughout machine learning. 
 
@@ -134,7 +134,7 @@ We now present a novel means of marginalising hyperparam
 %------- APPROXIMATE HYPERPARAMETER MARGINALISATION --------
 \section{Approximate Hyperparameter Marginalisation}
 
-In this section we introduce an approximate method for performing inference using a Gaussian process which accommodates the inherent uncertainty one should have about the value of hyperparameters, but which does not suffer from excessive computational expense. Rather than attempt to approximate the integral in (\ref{fullmargint}), we present a philosophical shift away from the standard \verb"GP" prior opting instead to develop a modified prior which incorporates and marginalises the uncertainty in the hyperparameters \emph{before} it is fused with observations. The result is an adjusted covariance function which can be used interchangeably with a standard covariance function in \verb"GP" inference, but whose parameters are now \emph{hyper-hyperparameters} explaining the marginalised covariance function.
+In this section we introduce an approximate method for performing inference, using a Gaussian process, which accommodates the inherent uncertainty one should have about the value of hyperparameters, but which does not suffer from excessive computational expense. Rather than attempt to approximate the integral in (\ref{fullmargint}), we present a novel approach which uses a modified prior that incorporates and marginalises the uncertainty in the hyperparameters \emph{before} it is fused with observations. The result is an adjusted covariance function which can be used interchangeably with a standard covariance function in \verb"GP" inference, but whose parameters are now \emph{hyper-hyperparameters} explaining the marginalised covariance function.
 
 \subsection{Homogenous Exponential Covariance Functions} \mikesays{this section defines the general class of covariance functions our method is appropriate to, which we can call Homogenous Exponential covariance functions}
 
@@ -142,7 +142,7 @@ As is the case in standard \verb"GP" inference, a prior covariance function must
 \begin{equation}
 K_\theta(x,x^\prime) = h^2 \exp \left( -\frac{1}{2} \frac{\bigtriangleup^2}{L^2} \right)
 \end{equation}
-where $\bigtriangleup^2 = (x - x^\prime)^2$, and $h$ is a scaling parameter termed the output scale. The parameter $L$, the \emph{length scale}, affects how closely points co-vary as a function of $\bigtriangleup^2$. The length parameter is perhaps the most crucial hyperparameter to train correctly, and is where we begin our exposition.
+where $\bigtriangleup^2 = (x - x^\prime)^2$, and $h$ is a scaling parameter termed the output scale. The parameter $L$, the \emph{length scale}, affects how closely outputs co-vary as a function of $\bigtriangleup^2$. The length parameter is perhaps the most crucial hyperparameter to train correctly, and is where we begin our exposition.
 
 \mikesays{We can also say that marginalising the output scale can be done
 analytically with an inverse-gamma prior on the squared output scale,
@@ -205,7 +205,8 @@ The Rational Quadratic covariance funciton represents one means of approximately
 \subsection{Marginal Homogenous Exponential Covariance Function} \mikesays{now we talk about our covariance, which I've called Marginal Homogenous Exponential covariances}
 
 
-The standard \verb"GP" prior assumes that the value of $L$ is deterministic; any distribution an individual has over $L$ is purely the epistemic characterisation of their uncertainty in the `true' value of $L$. We alter the prior such that we make $L$ a random variable with its own generative distribution $p(L)$. The value of $L$ should be strictly positive \jansays{no the way you defined it above L can be anything. Maybe should def $\exp(-\Delta^2 / L)$ instead of .../$L^2$.. this was the way we used to do it in February}, hence we make the substitution $L=\exp(\beta)$ \jansays{$\beta := \log(L)$ } and define a Gaussian distribution over $\beta$ so that $p(L)$ will have strictly positive support: 
+The standard \verb"GP" prior assumes that the value of $L$ is deterministic; any distribution an individual has over $L$ is purely the epistemic characterisation of their uncertainty in the `true' value of $L$. We alter the prior such that we make $L$ a random variable with its own generative distribution $p(L)$. The value of $L$ should be strictly positive, %\jansays{no the way you defined it above L can be anything. Maybe should def $\exp(-\Delta^2 / L)$ instead of .../$L^2$.. this was the way we used to do it in February}
+hence we make the substitution $\beta := \log(L)$ and define a Gaussian distribution over $\beta$ so that $p(L)$ will have strictly positive support: 
 \begin{equation}\label{betaSEkernel}
 K_\theta(x,x^\prime) = h^2 \exp \left( -\frac{1}{2}\bigtriangleup^2 \exp(-2\beta) \right)
 \end{equation}
@@ -214,9 +215,9 @@ which we will write as $K_\beta$, and
 p(\beta|\nu,\Lambda) &= \mathcal{N}(\beta; \nu, \Lambda) \nonumber\\
 &= \frac{1}{\sqrt{2 \pi \Lambda}} \exp \left( \frac{ -(\beta - \nu)^2}{2\Lambda} \right) \label{betapdf}
 \end{align}
-where $\nu$ and $\Lambda$ form hyper-hyperparmeters.
+where $\nu$ and $\Lambda$ are hyper-hyperparmeters.
 
-As stated before, we marginalise our the uncertainty in $\beta$ (or $L$), before fusing the prior with observations. 
+As stated before, we marginalise out the uncertainty in $\beta$ (or $L$), before fusing the prior with observations. 
 
 \jansays{Perhaps we should talk about the moment matching idea first.. As far as I can remember: Ie taylor expand the marginalized process ... it then turns out the the kernel of the matched process equals the marginalized kernel you write down in (14) below..}
 
@@ -224,7 +225,7 @@ The marginalised kernel is calculated by evaluating the following integral:
 \begin{equation} \label{kernelmargint}
 K_{\nu,\Lambda} = \int_{-\infty}^{+\infty} K_\beta \; p(\beta|\nu,\Lambda) d\beta
 \end{equation}
-which is non-analytic given the current form of $K_\beta$. We approximate the solution to the integral by first approximating $K_\beta$ using a second-order Taylor expansion around the mean of $p(\beta)$ given by $\nu$. In order to make the integral analytic, we would like $K_\beta$ to be in exponential form, hence we note the following identity and substitution:
+which is non-analytic given the current form of $K_\beta$. We approximate the solution to the integral by first approximating $K_\beta$ using a second-order Taylor expansion around the mean of $p(\beta)$ given by $\nu$. In order to ensure that the approximate kernel is positive semi-definite we force $K_\beta$ to be in exponential form, hence we note the following identity and substitution:
 \begin{align}
 K_\beta &= \exp \left( -\ln \frac{1}{K_\beta} \right) \nonumber\\ 
 &= \exp \left( -A \right) \label{Asub}
@@ -289,6 +290,28 @@ We note that the product of kernels is also a kernel. Both exponentials in (\ref
 
 %------- EXPERIMENTS --------
 \section{Experiments}
+
+
+
+\subsection{Posterior functions with differing length scales}
+
+When using standard kernels, functions drawn from the prior will have a fixed length scale; when using our kernel, the length scale of functions drawn from the prior can take a number a range of values as a result of the distribution over length scales. When our prior is fused with observations to form a posterior \verb"GP", we are able to describe functions that may have generated the observations over a range of length scales. When data is limited this is particularly crucial as a whole range of length scales may be permissible with regards to the data generated, even if one is favoured through type-II maximum likelihood methods. As data increases the range of permissible length scales reduces, eventually collapsing to the true length scale.
+
+We demonstrate the above behaviour and its advantage over other methods in this section. We begin by drawing a function from a prior \verb"GP" with known length scale. From this we can generate a training set of between $X$ and $X$ observations in the domain $\mathcal{X}\in [-3,3]$. We train the hyperparameters or hyper-hyperparameters of our test methods using type-II maximum likelihood on the given training set. Now we go back to the original \verb"GP" and draw a set of $X$ functions from the posterior (so that the functions still go through the original training data) with length scales ranging from $X$ to $X$. An example training set and resulting set of posterior functions can be seen in figure XXXX. A test set with $100$ observations is generated from each function and a log likelihood is calculated for each method. This process is repeated with $100$ different starting functions and training data.
+
+We plot the log length scale (of the posterior function) against the likelihood of the data for each method.
+
+
+
+
+
+\subsection{Real world dataset}
+
+
+
+
+
+
 
 
 
