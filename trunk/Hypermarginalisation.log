@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2011.11.30)  29 MAY 2012 18:06
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2011.11.30)  30 MAY 2012 15:13
 entering extended mode
  %&-line parsing enabled.
 **Hypermarginalisation.tex
@@ -246,19 +246,19 @@ File: xkeyval.tex 2008/08/13 v2.6a key=value parser (HA)
 (./Hypermarginalisation.aux)
 \openout1 = `Hypermarginalisation.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 49.
-LaTeX Font Info:    ... okay on input line 49.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 49.
-LaTeX Font Info:    ... okay on input line 49.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 49.
-LaTeX Font Info:    ... okay on input line 49.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 49.
-LaTeX Font Info:    ... okay on input line 49.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 49.
-LaTeX Font Info:    ... okay on input line 49.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 49.
-LaTeX Font Info:    ... okay on input line 49.
-LaTeX Font Info:    Try loading font information for OT1+ptm on input line 49.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 51.
+LaTeX Font Info:    ... okay on input line 51.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 51.
+LaTeX Font Info:    ... okay on input line 51.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 51.
+LaTeX Font Info:    ... okay on input line 51.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 51.
+LaTeX Font Info:    ... okay on input line 51.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 51.
+LaTeX Font Info:    ... okay on input line 51.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 51.
+LaTeX Font Info:    ... okay on input line 51.
+LaTeX Font Info:    Try loading font information for OT1+ptm on input line 51.
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/ot1ptm.fd
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
@@ -267,39 +267,50 @@ ABD: EveryShipout initializing macros
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: End \AtBeginDocument code.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <17.28> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 52.
-LaTeX Font Info:    Try loading font information for U+msa on input line 52.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 54.
+LaTeX Font Info:    Try loading font information for U+msa on input line 54.
 
 (/usr/share/texmf-texlive/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2009/06/22 v3.00 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 52.
+LaTeX Font Info:    Try loading font information for U+msb on input line 54.
 
 (/usr/share/texmf-texlive/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2009/06/22 v3.00 AMS symbols B
 )
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 52.
-LaTeX Font Info:    Try loading font information for OT1+pcr on input line 52.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 54.
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 54.
 
 (/usr/share/texmf-texlive/tex/latex/psnfss/ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 55.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 57.
  [1
 
 ]
-Overfull \hbox (6.0pt too wide) in paragraph at lines 139--140
-[][][][][][] 
+(./figures/direct_samples2.tex)
+File: figures/direct_samples2.eps Graphic file (type eps)
+ <figures/direct_samples2.eps>
+(./figures/slice_samples2.tex)
+File: figures/slice_samples2.eps Graphic file (type eps)
+ <figures/slice_samples2.eps>
+Overfull \hbox (2.7536pt too wide) in paragraph at lines 135--145
+[][] [] 
  []
 
 [2]
-Overfull \hbox (6.0pt too wide) in paragraph at lines 164--165
+Overfull \hbox (6.0pt too wide) in paragraph at lines 155--156
+[][][][][][] 
+ []
+
+
+Overfull \hbox (6.0pt too wide) in paragraph at lines 180--181
 [][][][][][][] 
  []
 
-(./figures/gamma_prior.tex)
+[3] (./figures/gamma_prior.tex)
 File: figures/gamma_prior.eps Graphic file (type eps)
  <figures/gamma_prior.eps>
 (./figures/log_normal_prior.tex)
@@ -311,28 +322,28 @@ File: figures/RQ_cov.eps Graphic file (type eps)
 File: figures/our_cov.eps Graphic file (type eps)
 
 <figures/our_cov.eps>
-Overfull \hbox (2.7536pt too wide) in paragraph at lines 179--200
+Overfull \hbox (2.7536pt too wide) in paragraph at lines 195--216
 [][] [] 
  []
 
 
-Overfull \hbox (2.7536pt too wide) in paragraph at lines 179--200
+Overfull \hbox (2.7536pt too wide) in paragraph at lines 195--216
 [] [] 
  []
 
 
-Overfull \hbox (6.0pt too wide) in paragraph at lines 205--206
+Overfull \hbox (6.0pt too wide) in paragraph at lines 221--222
 [][][][][][] 
  []
 
-[3] [4] (./Hypermarginalisation.bbl) [5] (./Hypermarginalisation.aux) ) 
+[4] [5] (./Hypermarginalisation.bbl) [6] (./Hypermarginalisation.aux) ) 
 Here is how much of TeX's memory you used:
- 4168 strings out of 495062
- 57260 string characters out of 1182643
- 133280 words of memory out of 3000000
- 7243 multiletter control sequences out of 15000+50000
- 18492 words of font info for 60 fonts, out of 3000000 for 9000
+ 4185 strings out of 495062
+ 57573 string characters out of 1182643
+ 130335 words of memory out of 3000000
+ 7251 multiletter control sequences out of 15000+50000
+ 19138 words of font info for 61 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
- 40i,11n,90p,860b,598s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 40i,11n,90p,968b,619s stack positions out of 5000i,500n,10000p,200000b,50000s
 
-Output written on Hypermarginalisation.dvi (5 pages, 37284 bytes).
+Output written on Hypermarginalisation.dvi (6 pages, 44012 bytes).
