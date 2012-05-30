@@ -144,6 +144,7 @@ As per Figure \ref{fig:ML}, \eqref{eq:ML} is equivalent to approximating the lik
 	  \label{fig:MCMC}
 	\end{subfigure}
 \caption{\subref{fig:ML}) Samples (black dots) obtained by optimising the log-likelihood (grey) using a global optimiser, and in blue, the maximum likelihood approximation of the likelihood surface. \subref{fig:MCMC}) Samples obtained by taking draws from the posterior using an {\scshape mcmc} method.}
+\label{fig:periodic_likelihood}
 \end{figure}
 
 We now present a computationally inexpensive approach to approximately marginalising hyperparameters.
@@ -155,48 +156,21 @@ We now propose a general-purpose family of covariance functions that result from
 
 % In this section we introduce an approximate method for performing inference, using a Gaussian process, which accommodates the inherent uncertainty one should have about the value of hyperparameters, but which does not suffer from excessive computational expense. Rather than attempt to approximate the integral in (\ref{fullmargint}), we present a novel approach which uses a modified prior that incorporates and marginalises the uncertainty in the hyperparameters \emph{before} it is fused with observations. The result is an adjusted covariance function which can be used interchangeably with a standard covariance function in {\scshape gp} inference, but whose parameters are now \emph{hyper-hyperparameters} explaining the marginalised covariance function.
 
-\subsection{Homogenous Exponential Covariance Functions} \mikesays{this section defines the general class of covariance functions our method is appropriate to, which we can call Homogenous Exponential covariance functions}
+\subsection{Homogenous Exponential Covariance Functions} 
 
 We consider the general form of covariance, which we term the {\it homogenous exponential}
 \begin{equation}\label{eq:he}
 K_\theta(x,x^\prime) = h^2 \exp \left( -\frac{1}{2} \frac{\bigtriangleup^2}{L^2} \right)\,,
 \end{equation}
-where $h$ is a scaling parameter termed the output scale, and $L$ is the \emph{length scale}. This form captures many of the most commonly used covariance functions. If $\bigtriangleup^2 = \sum_i (x_i - x_i^\prime)^2$, \eqref{eq:he} becomes the ubquitous \emph{squared exponential}. If $\bigtriangleup^2 = |x-x'|$,  \eqref{eq:he} is the Ornstein-Uhlenbeck covariance. Many other covariances can be constructed by taking $\bigtriangleup^2$ as other metrics, allowing for warpings of the input space \citep{snelson2004warped} and inference in more structured domains \citep{garnett2010bayesian}.
+where $h$ is a scaling parameter termed the output scale, and $L$ is the \emph{length scale}. This form captures many of the most commonly used covariance functions. If $\bigtriangleup^2 = \sum_i (x_i - x_i^\prime)^2$, \eqref{eq:he} becomes the ubquitous \emph{squared exponential}. If $\bigtriangleup^2 = |x-x'|$,  \eqref{eq:he} is the Ornstein-Uhlenbeck covariance. Many other covariances can be constructed by taking $\bigtriangleup^2$ as other metrics, allowing for periodic covariances, warpings of the input space \citep{snelson2004warped} and inference in more structured domains \citep{garnett2010bayesian}.
 
+The output scale $h$ can be tractably marginalised according to suitable priors \citep{kennedy1998bayesian}. Even if performing type-II maximum likelihood, the output scale is usually well-specified by even a moderate amount of data. We will not consider this hyperparameter further. 
 
-
-The length scale $L$ affects how closely outputs co-vary as a function of $\bigtriangleup^2$. Our predictions will ultimately be very sensitive to the value of the length scale; a short length scale will favour rough functions, a long length scale will favour smoother functions. 
-
-\mikesays{We can also say that marginalising the output scale can be done
-analytically with an inverse-gamma prior on the squared output scale,
-but then we would no longer have a GP, which would kind of defeat the
-point. Alternatively, you can use our approach to approximately
-marginalise the output scale h by resolving
-$int h^2 K(x, x') p(h) dh$
-where $K(x, x')$ is a normalised cov fn. Taking a Gamma prior for $h^-2$,
-rather than a Gaussian for  $log h$, is a sensible thing to do here as,
-with reference to the previous plots, we'd rather favour infinite
-output scale over zero output scale as we get more and more uncertain.
-That is, if we have no idea of the output scale at all, it seems
-unreasonable for us to expect most of the data to be within epsilon of
-the prior mean. With a Gamma prior for $h^-2$ with mean $mu_h$ and shape
-parameter $a_h$, our integral resolves to
-$a_h Gamma(-1 + a_h) / (mu_h Gamma(a_h) ) K(x, x')$
-where Gamma is the Gamma function. So basically we just replace the
-squared output scale of our covariance function with $a_h Gamma(-1 +
-a_h) / (mu_h Gamma(a_h) )$ and we're done. This trick has been done by previous authors- I can chase up references.}
-
-\jansays{ COULD WE NOT BE MORE GENERAL SAYING:  
-We assume our GP prior is endowed with a kernel function of the form 
-\begin{equation}
-K_\theta(x,x^\prime) = h^2 \exp \left( -\frac{1}{2} \frac{d(x,x')}{L^2} \right)
-\end{equation}
-where $d$ is an arbitrary function. Typically, $d$ will be a distance metric. For instance, choosing $d(x,x') = x M x'$ for a pos. def. matrix $M$ yields the squared exponential kernel. Or, $d(x,x') = |x-x'|$ gives rise to the .
-... this should not affect our derivations below..}
+The length scale $L$ affects how closely outputs co-vary as a function of $\bigtriangleup^2$. Our predictions will ultimately be very sensitive to the value of the length scale; a short length scale will favour rough functions, a long length scale will favour smoother functions. Unfortunately, the likelihood of the length scale is often highly multi-modal: Figure \ref{fig:periodic_likelihood} illustrates the likelihood surface as a function of $\theta = L$ for a periodic covariance, where the multiple modes correspond to harmonics of the latent period and sampling frequency. That is, given limited data, the posterior for the input scale is likely to have large variance. As such, type-II maximum likelihood for this hyperparameter will lead to problematic over-fitting. 
 
 \subsection{Rational Quadratic Covariance Function} 
 
-The Rational Quadratic covariance function represents one means of approximately marginalising the input scale of a squared exponential covariance. It assumes a gamma prior, which, problematically, puts excessive weight on very lagre input scales when we are very uncertain. See Figure \ref{fig:rq_vs_our_cov}.
+The Rational Quadratic covariance function represents one means of approximately marginalising the input scale of a squared exponential covariance. It assumes a gamma prior, which, problematically, puts excessive weight on very large input scales when we are very uncertain. See Figure \ref{fig:rq_vs_our_cov}.
 
 \begin{figure}
 	\begin{subfigure}[b]{7cm}
