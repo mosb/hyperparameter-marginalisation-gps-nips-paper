@@ -1,9 +1,20 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
 \bibitem{chen2000monte}
 M.H. Chen, Q.M. Shao, and J.G. Ibrahim.
 \newblock {\em Monte Carlo methods in Bayesian computation}.
 \newblock Springer Verlag, 2000.
+
+\bibitem{garnett2010bayesian}
+R.~Garnett, MA~Osborne, and SJ~Roberts.
+\newblock Bayesian optimization for sensor set selection.
+\newblock In {\em Proceedings of the 9th ACM/IEEE International Conference on
+  Information Processing in Sensor Networks}, pages 209--219. ACM, 2010.
+
+\bibitem{kennedy1998bayesian}
+M.~Kennedy.
+\newblock Bayesian quadrature with non-normal approximating functions.
+\newblock {\em Statistics and Computing}, 8(4):365--375, 1998.
 
 \bibitem{neal1997monte}
 R.M. Neal.
@@ -39,5 +50,11 @@ C.E. Rasmussen and Z.~Ghahramani.
 J.~Shawe-Taylor and N.~Cristianini.
 \newblock {\em Kernel methods for pattern analysis}.
 \newblock Cambridge Univ Pr, 2004.
+
+\bibitem{snelson2004warped}
+E.~Snelson, C.E. Rasmussen, and Z.~Ghahramani.
+\newblock Warped gaussian processes.
+\newblock {\em Advances in neural information processing systems}, 16:337--344,
+  2004.
 
 \end{thebibliography}
