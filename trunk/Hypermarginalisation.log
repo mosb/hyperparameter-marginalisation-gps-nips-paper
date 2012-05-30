@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2011.11.30)  30 MAY 2012 15:13
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2011.11.30)  30 MAY 2012 17:39
 entering extended mode
  %&-line parsing enabled.
 **Hypermarginalisation.tex
@@ -287,6 +287,9 @@ File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 57.
+
+Underfull \vbox (badness 6157) has occurred while \output is active []
+
  [1
 
 ]
@@ -296,17 +299,17 @@ File: figures/direct_samples2.eps Graphic file (type eps)
 (./figures/slice_samples2.tex)
 File: figures/slice_samples2.eps Graphic file (type eps)
  <figures/slice_samples2.eps>
-Overfull \hbox (2.7536pt too wide) in paragraph at lines 135--145
+Overfull \hbox (2.7536pt too wide) in paragraph at lines 136--146
 [][] [] 
  []
 
 [2]
-Overfull \hbox (6.0pt too wide) in paragraph at lines 155--156
+Overfull \hbox (6.0pt too wide) in paragraph at lines 156--157
 [][][][][][] 
  []
 
 
-Overfull \hbox (6.0pt too wide) in paragraph at lines 180--181
+Overfull \hbox (6.0pt too wide) in paragraph at lines 181--182
 [][][][][][][] 
  []
 
@@ -322,28 +325,28 @@ File: figures/RQ_cov.eps Graphic file (type eps)
 File: figures/our_cov.eps Graphic file (type eps)
 
 <figures/our_cov.eps>
-Overfull \hbox (2.7536pt too wide) in paragraph at lines 195--216
+Overfull \hbox (2.7536pt too wide) in paragraph at lines 196--217
 [][] [] 
  []
 
 
-Overfull \hbox (2.7536pt too wide) in paragraph at lines 195--216
+Overfull \hbox (2.7536pt too wide) in paragraph at lines 196--217
 [] [] 
  []
 
 
-Overfull \hbox (6.0pt too wide) in paragraph at lines 221--222
+Overfull \hbox (6.0pt too wide) in paragraph at lines 222--223
 [][][][][][] 
  []
 
-[4] [5] (./Hypermarginalisation.bbl) [6] (./Hypermarginalisation.aux) ) 
+[4] [5] (./Hypermarginalisation.bbl [6]) [7] (./Hypermarginalisation.aux) ) 
 Here is how much of TeX's memory you used:
- 4185 strings out of 495062
- 57573 string characters out of 1182643
- 130335 words of memory out of 3000000
- 7251 multiletter control sequences out of 15000+50000
+ 4194 strings out of 495062
+ 57786 string characters out of 1182643
+ 130380 words of memory out of 3000000
+ 7260 multiletter control sequences out of 15000+50000
  19138 words of font info for 61 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
  40i,11n,90p,968b,619s stack positions out of 5000i,500n,10000p,200000b,50000s
 
-Output written on Hypermarginalisation.dvi (6 pages, 44012 bytes).
+Output written on Hypermarginalisation.dvi (7 pages, 46564 bytes).
