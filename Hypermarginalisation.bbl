@@ -5,6 +5,18 @@ M.H. Chen, Q.M. Shao, and J.G. Ibrahim.
 \newblock {\em Monte Carlo methods in Bayesian computation}.
 \newblock Springer Verlag, 2000.
 
+\bibitem{neal1997monte}
+R.M. Neal.
+\newblock Monte carlo implementation of gaussian process models for bayesian
+  regression and classification.
+\newblock {\em Arxiv preprint physics/9701026}, 1997.
+
+\bibitem{osborne2009gaussian}
+M.A. Osborne, R.~Garnett, and S.J. Roberts.
+\newblock Gaussian processes for global optimization.
+\newblock In {\em 3rd International Conference on Learning and Intelligent
+  Optimization (LION3)}, pages 1--15, 2009.
+
 \bibitem{osbornebayesquad}
 M.A. Osborne, R.~Garnett, S.J. Roberts, C.~Hart, S.~Aigrain, N.P. Gibson, and
   S.~Aigrain.
@@ -22,5 +34,10 @@ C.E. Rasmussen and Z.~Ghahramani.
 \newblock Bayesian monte carlo.
 \newblock {\em Advances in neural information processing systems}, 15:489--496,
   2003.
+
+\bibitem{shawe2004kernel}
+J.~Shawe-Taylor and N.~Cristianini.
+\newblock {\em Kernel methods for pattern analysis}.
+\newblock Cambridge Univ Pr, 2004.
 
 \end{thebibliography}

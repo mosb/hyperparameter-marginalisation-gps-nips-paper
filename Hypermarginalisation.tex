@@ -55,21 +55,22 @@ Steve\\}
 
 %------- ABSTRACT --------
 \begin{abstract}
-Kernel and covariance functions are often parameterised by hyperparameters, unknown {\it a-priori}. We propose a novel means of approximately integrating over these hyperparameters. This approach gives rise to a novel class of covariance functions which are robust to hyperparameter uncertainty, avoiding the over-fitting that often accompanies type-II maximum-likelihood fitting of the hyperparameters. We demonstrate the efficacy of our covariances for Gaussian process regression on both synthetic and real data.
-% \jansays{In Bayesian methods a common problem is to choose a prior. In inference with Gaussian processes this task could involve choosing kernel function hyperparameters. In practice however, it is often unclear how to make this choice a priori. Therefore, most implementations deviate from proper Bayesian treatment by estimating the hyperparameters from the data via maximum lmarginal-ikelihood methods. In contrast, we propose to add another hierarchy of inference on top of that. In particular, we propose to place a prior distribution over the hyperparameters. Its hyperparemeters can in turn be estimated learned from the data. Since the resuting integrals of the marginalizations are non-analytic we use a Taylor expansion to yield a Gaussian process which approximates the correct process with marginalized hyperparameters.
-% PERHAPS WRITE ABOUT INTEGRAL KERNEL AND RELATION TO RATIONAL QUADRATIC?
-% We conduct experiments illustrating the benefits our approach on artificial as well as on real data.}
+Kernel and covariance functions are often parameterised by hyperparameters, unknown {\it a-priori}. We propose a novel means of approximately integrating over these hyperparameters. This approach gives rise to a novel class of covariance functions which are robust to hyperparameter uncertainty, avoiding the over-fitting that often accompanies type-II maximum-likelihood fitting. We demonstrate the efficacy of our covariances for Gaussian process regression on both synthetic and real data.
 \end{abstract}
 
 
 %------- INTRODUCTION--------
 \section{Introduction}
 
-Kernels and covariances are vital to much of Machine Learning. 
+Kernel and covariance functions are vital to much of machine learning and data mining \citep{shawe2004kernel}. In this paper, we consider Gaussian process \citep{rassandwill} inference, which has at its heart just such a covariance function. The hyperparameters that define such functions are rarely known {\it a-priori}. Given training data, these hyperparameters are often set by type-II maximum likelihood, which can lead to overfitting. A more rigorous alternative is to integrate over, or marginalise, the hyperparameters, which is unfortunately usually intractable. While sampling approaches \citep{neal1997monte} have been developed to address this problem, they are prohibitively computationally expensive for large numbers of hyperparameters. 
 
-The hyperparameters of such functions are rarely known {\it a-priori}. This is particularly important when we have small amounts of data, important for applications where obtaining data is expensive (computationally or otherwise).
+We introduce a Laplace approach to approximately marginalise covariance hyperparameters. This gives us a robust family of covariances that are tolerant to uncertainty in the hyperparameters. Our method is particularly appropriate when such uncertainty is likely to be significant, as when only small amounts of data are available. We are motivated by scenarios where obtaining data is expensive (computationally or otherwise), such as in global optimisation \citep{osborne2009gaussian}. 
 
-Hyperparameters are often set by type-II maximum likelihood. Monte Carlo is too expensive. We introduce a Laplace approximation. This gives us a robust family of covariances that are tolerant to uncertainty in the hyperparameters. 
+
+% \jansays{In Bayesian methods a common problem is to choose a prior. In inference with Gaussian processes this task could involve choosing kernel function hyperparameters. In practice however, it is often unclear how to make this choice a priori. Therefore, most implementations deviate from proper Bayesian treatment by estimating the hyperparameters from the data via maximum lmarginal-ikelihood methods. In contrast, we propose to add another hierarchy of inference on top of that. In particular, we propose to place a prior distribution over the hyperparameters. Its hyperparemeters can in turn be estimated learned from the data. Since the resuting integrals of the marginalizations are non-analytic we use a Taylor expansion to yield a Gaussian process which approximates the correct process with marginalized hyperparameters.
+% PERHAPS WRITE ABOUT INTEGRAL KERNEL AND RELATION TO RATIONAL QUADRATIC?
+% We conduct experiments illustrating the benefits our approach on artificial as well as on real data.}
+
 
 %------- GAUSSIAN PROCESSES--------
 \section{Gaussian Processes}
@@ -142,23 +143,29 @@ As per Figure \ref{fig:ML}, \eqref{eq:ML} is equivalent to approximating the lik
 	  \caption{}
 	  \label{fig:MCMC}
 	\end{subfigure}
-\caption{\subref{fig:ML}) Samples (black dots) obtained by optimising the log-likelihood (grey) using a global optimiser, and in blue, the maximum likelihood approximation of the likelihood surface. \subref{fig:MCMC}) Samples obtained by taking draws from the posterior using an MCMC method.}
+\caption{\subref{fig:ML}) Samples (black dots) obtained by optimising the log-likelihood (grey) using a global optimiser, and in blue, the maximum likelihood approximation of the likelihood surface. \subref{fig:MCMC}) Samples obtained by taking draws from the posterior using an {\scshape mcmc} method.}
 \end{figure}
 
-We now present a novel means of marginalising hyperparam
+We now present a computationally inexpensive approach to approximately marginalising hyperparameters.
 
 %------- APPROXIMATE HYPERPARAMETER MARGINALISATION --------
 \section{Approximate Hyperparameter Marginalisation}
 
-In this section we introduce an approximate method for performing inference, using a Gaussian process, which accommodates the inherent uncertainty one should have about the value of hyperparameters, but which does not suffer from excessive computational expense. Rather than attempt to approximate the integral in (\ref{fullmargint}), we present a novel approach which uses a modified prior that incorporates and marginalises the uncertainty in the hyperparameters \emph{before} it is fused with observations. The result is an adjusted covariance function which can be used interchangeably with a standard covariance function in {\scshape gp} inference, but whose parameters are now \emph{hyper-hyperparameters} explaining the marginalised covariance function.
+We now propose a general-purpose family of covariance functions that result from approximately marginalising the hyperparameters of an homogenous exponential covariance. 
+
+% In this section we introduce an approximate method for performing inference, using a Gaussian process, which accommodates the inherent uncertainty one should have about the value of hyperparameters, but which does not suffer from excessive computational expense. Rather than attempt to approximate the integral in (\ref{fullmargint}), we present a novel approach which uses a modified prior that incorporates and marginalises the uncertainty in the hyperparameters \emph{before} it is fused with observations. The result is an adjusted covariance function which can be used interchangeably with a standard covariance function in {\scshape gp} inference, but whose parameters are now \emph{hyper-hyperparameters} explaining the marginalised covariance function.
 
 \subsection{Homogenous Exponential Covariance Functions} \mikesays{this section defines the general class of covariance functions our method is appropriate to, which we can call Homogenous Exponential covariance functions}
 
-As is the case in standard {\scshape gp} inference, a prior covariance function must be selected which is representative of any prior belief about the function of interest. In order to develop our method we first look at one of the most pervasive covariance functions used in Bayesian inference: the \emph{Squared Exponential}, or \emph{Gaussian}, kernel:
-\begin{equation}
-K_\theta(x,x^\prime) = h^2 \exp \left( -\frac{1}{2} \frac{\bigtriangleup^2}{L^2} \right)
+We consider the general form of covariance, which we term the {\it homogenous exponential}
+\begin{equation}\label{eq:he}
+K_\theta(x,x^\prime) = h^2 \exp \left( -\frac{1}{2} \frac{\bigtriangleup^2}{L^2} \right)\,,
 \end{equation}
-where $\bigtriangleup^2 = (x - x^\prime)^2$, and $h$ is a scaling parameter termed the output scale. The parameter $L$, the \emph{length scale}, affects how closely outputs co-vary as a function of $\bigtriangleup^2$. The length parameter is perhaps the most crucial hyperparameter to train correctly, and is where we begin our exposition.
+where $h$ is a scaling parameter termed the output scale, and $L$ is the \emph{length scale}. This form captures many of the most commonly used covariance functions. If $\bigtriangleup^2 = \sum_i (x_i - x_i^\prime)^2$, \eqref{eq:he} becomes the ubquitous \emph{squared exponential}. If $\bigtriangleup^2 = |x-x'|$,  \eqref{eq:he} is the Ornstein-Uhlenbeck covariance. Many other covariances can be constructed by taking $\bigtriangleup^2$ as other metrics, allowing for warpings of the input space \citep{snelson2004warped} and inference in more structured domains \citep{garnett2010bayesian}.
+
+
+
+The length scale $L$ affects how closely outputs co-vary as a function of $\bigtriangleup^2$. Our predictions will ultimately be very sensitive to the value of the length scale; a short length scale will favour rough functions, a long length scale will favour smoother functions. 
 
 \mikesays{We can also say that marginalising the output scale can be done
 analytically with an inverse-gamma prior on the squared output scale,
@@ -184,7 +191,7 @@ We assume our GP prior is endowed with a kernel function of the form
 \begin{equation}
 K_\theta(x,x^\prime) = h^2 \exp \left( -\frac{1}{2} \frac{d(x,x')}{L^2} \right)
 \end{equation}
-where $d$ is an arbitrary function. Typically, $d$ will be a distance metric. For instance, choosing $d(x,x') = x M x'$ for a pos. def. matrix $M$ yields the squared exponential kernel. Or, $d(x,x') = |x-x'|$ gives rise to the Ornstein-Uhlenbeck kernel.
+where $d$ is an arbitrary function. Typically, $d$ will be a distance metric. For instance, choosing $d(x,x') = x M x'$ for a pos. def. matrix $M$ yields the squared exponential kernel. Or, $d(x,x') = |x-x'|$ gives rise to the .
 ... this should not affect our derivations below..}
 
 \subsection{Rational Quadratic Covariance Function} 
