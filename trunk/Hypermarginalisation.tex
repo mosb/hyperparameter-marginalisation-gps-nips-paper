@@ -55,7 +55,7 @@ Steve\\}
 
 %------- ABSTRACT --------
 \begin{abstract}
-Kernel and covariance functions are often parameterised by hyperparameters, unknown {\it a-priori}. We propose a novel means of approximately integrating over these hyperparameters. This approach gives rise to a novel class of covariance functions which are robust to hyperparameter uncertainty, avoiding the over-fitting that often accompanies type-II maximum-likelihood fitting. We demonstrate the efficacy of our covariances for Gaussian process regression on both synthetic and real data.
+Kernel and covariance functions are often parameterised by hyperparameters, unknown {\it a-priori}. We propose a novel means of approximately integrating over these hyperparameters. This approach gives rise to a novel class of covariance functions, Marginal Generalised Exponentials, which are robust to hyperparameter uncertainty, avoiding the over-fitting that often accompanies type-II maximum-likelihood fitting. We demonstrate the efficacy of our covariances for Gaussian process regression on both synthetic and real data.
 \end{abstract}
 
 
@@ -156,54 +156,30 @@ We now propose a general-purpose family of covariance functions that result from
 
 % In this section we introduce an approximate method for performing inference, using a Gaussian process, which accommodates the inherent uncertainty one should have about the value of hyperparameters, but which does not suffer from excessive computational expense. Rather than attempt to approximate the integral in (\ref{fullmargint}), we present a novel approach which uses a modified prior that incorporates and marginalises the uncertainty in the hyperparameters \emph{before} it is fused with observations. The result is an adjusted covariance function which can be used interchangeably with a standard covariance function in {\scshape gp} inference, but whose parameters are now \emph{hyper-hyperparameters} explaining the marginalised covariance function.
 
-\subsection{Homogenous Exponential Covariance Functions} 
+\subsection{Generalised Exponential Covariance Functions} 
 
 We consider the general form of covariance, which we term the {\it homogenous exponential}
 \begin{equation}\label{eq:he}
 K_\theta(x,x^\prime) = h^2 \exp \left( -\frac{1}{2} \frac{\bigtriangleup^2}{L^2} \right)\,,
 \end{equation}
-where $h$ is a scaling parameter termed the \emph{output scale}, and $L$ is the \emph{length scale}; the vector $\bm{\theta}$ contains both hyperparameters. This form captures many of the most commonly used covariance functions. If $\bigtriangleup^2 = \sum_i (x_i - x_i^\prime)^2$, \eqref{eq:he} becomes the ubquitous \emph{squared exponential}. If $\bigtriangleup^2 = |x-x'|$,  \eqref{eq:he} is the Ornstein-Uhlenbeck covariance. Many other covariances can be constructed by taking $\bigtriangleup^2$ as other metrics, allowing for periodic covariances, warpings of the input space \citep{snelson2004warped} and inference in more structured domains \citep{garnett2010bayesian}.
+where $h$ is a scaling parameter termed the \emph{output scale}, and $L$ is the \emph{length scale}; the vector $\bm{\theta}$ contains both hyperparameters. This form captures many of the most commonly used covariance functions. If $\bigtriangleup^2 = \sum_i (x_i - x_i^\prime)^2$, \eqref{eq:he} becomes the ubquitous \emph{squared exponential}. If $\bigtriangleup^2 = |x-x'|$,  \eqref{eq:he} is the exponential covariance. Many other covariances can be constructed by taking $\bigtriangleup^2$ as other metrics, allowing for periodic covariances, warpings of the input space \citep{snelson2004warped} and inference in more structured domains \citep{garnett2010bayesian}.
 
 The output scale $h$ can be tractably marginalised according to suitable priors \citep{kennedy1998bayesian}. Even if performing type-II maximum likelihood, the output scale is usually well-specified by even a moderate amount of data. We will not consider this hyperparameter further. 
 
 The length scale $L$ affects how closely outputs co-vary as a function of $\bigtriangleup^2$. Our predictions will ultimately be very sensitive to the value of the length scale; a short length scale will favour rough functions, a long length scale will favour smoother functions. Unfortunately, the likelihood of the length scale is often highly multi-modal: Figure \ref{fig:periodic_likelihood} illustrates the likelihood surface as a function of $\theta = L$ for a periodic covariance, where the multiple modes correspond to harmonics of the latent period and sampling frequency. That is, given limited data, the posterior for the input scale is likely to have large variance. As such, type-II maximum likelihood for this hyperparameter will lead to problematic over-fitting. 
 
-\subsection{Rational Quadratic Covariance Function} 
-
-The Rational Quadratic covariance function represents one means of approximately marginalising the input scale of a squared exponential covariance. It assumes a gamma prior, which, problematically, puts excessive weight on very large input scales when we are very uncertain. See Figure \ref{fig:rq_vs_our_cov}.
-
-\begin{figure}
-	\begin{subfigure}[b]{7cm}
-		\psfragfig[height = 2cm, width = 7cm]{figures/gamma_prior}
-		\caption{Gamma prior distributions for $1/L^2$}
-		\label{fig:gamma_prior}
-	\end{subfigure}
-	\begin{subfigure}[b]{7cm}
-		\psfragfig[height = 2cm, width = 7cm]{figures/log_normal_prior}
-		\caption{Gaussian prior distributions for $\log(L)$}
-		 \label{fig:log_normal_prior}
-	\end{subfigure}
- \\[0.2cm]
-	\begin{subfigure}[b]{7cm}
-		\psfragfig[height = 2cm, width = 7cm]{figures/RQ_cov}
-		\caption{Rational quadratic covariances}
-		\label{fig:RQ_cov}
-	\end{subfigure}
-	\begin{subfigure}[b]{7cm}
-		\psfragfig[height = 2cm, width = 7cm]{figures/our_cov}
-		\caption{Marginal homogenous exponential covariances}
-		 \label{fig:our_cov}
-	\end{subfigure}
-\caption{The different priors assumed by {\scshape rq} and {\scshape mhe} covariances give rise to different behaviours as the variance in the input scale ($\Lambda$) increases. The priors of \subref{fig:gamma_prior} assign more weight to very large input scales, whereas the priors of \subref{fig:log_normal_prior} assign more weight to small input scales. All figures have $\nu = 1$ and share the legends of \subref{fig:gamma_prior}) and \subref{fig:our_cov}).}
-\label{fig:rq_vs_our_cov}
-\end{figure}
+\subsection{Marginal Generalised Exponential Covariance Function} \mikesays{now we talk about our covariance, which I've called Marginal Generalised Exponential covariances}
 
 
-\subsection{Marginal Homogenous Exponential Covariance Function} \mikesays{now we talk about our covariance, which I've called Marginal Homogenous Exponential covariances}
 
 
-The standard {\scshape gp} prior assumes that the value of $L$ is deterministic; any distribution an individual has over $L$ is purely the epistemic characterisation of their uncertainty in the `true' value of $L$. We alter the prior such that we make $L$ a random variable with its own generative distribution $p(L)$. The value of $L$ should be strictly positive, %\jansays{no the way you defined it above L can be anything. Maybe should def $\exp(-\Delta^2 / L)$ instead of .../$L^2$.. this was the way we used to do it in February}
-hence we make the substitution $\beta := \log(L)$ and define a Gaussian distribution over $\beta$ so that $p(L)$ will have strictly positive support: 
+We propose to marginalise $L$ (which is strictly positive) according to a Gaussian prior to its logarithm, $\beta := \log(L)$;
+% \begin{equation}
+%  
+% \end{equation}
+
+
+ and define a Gaussian distribution over $\beta$ so that $p(L)$ will have strictly positive support: 
 \begin{equation}\label{betaSEkernel}
 K_\theta(x,x^\prime) = h^2 \exp \left( -\frac{1}{2}\bigtriangleup^2 \exp(-2\beta) \right)
 \end{equation}
@@ -256,6 +232,42 @@ K_{\nu,\Lambda} &\approx K_{\nu}\int_{-\infty}^{+\infty} \frac{1}{\sqrt{2 \pi \L
 \end{align}
 This result is a new kernel which is the product of the original kernel $K_\beta$ evaluated at $\beta=\nu$, and an expression which is a function of the squared distance $ \bigtriangleup^2$. 
 
+\subsection{Rational Quadratic Covariance Function} 
+
+The Rational Quadratic covariance function represents one means of approximately marginalising the input scale of a squared exponential covariance. It assumes a gamma prior, which, problematically, puts excessive weight on very large input scales when we are very uncertain. See Figure \ref{fig:rq_vs_our_cov}.
+
+the log-Gaussian prior dominates the inverse gamma prior
+
+\begin{equation}
+ 
+\end{equation}
+
+
+\begin{figure}
+	\begin{subfigure}[b]{7cm}
+		\psfragfig[height = 2cm, width = 7cm]{figures/gamma_prior}
+		\caption{Gamma prior distributions for $1/L^2$}
+		\label{fig:gamma_prior}
+	\end{subfigure}
+	\begin{subfigure}[b]{7cm}
+		\psfragfig[height = 2cm, width = 7cm]{figures/log_normal_prior}
+		\caption{Gaussian prior distributions for $\log(L)$}
+		 \label{fig:log_normal_prior}
+	\end{subfigure}
+ \\[0.2cm]
+	\begin{subfigure}[b]{7cm}
+		\psfragfig[height = 2cm, width = 7cm]{figures/RQ_cov}
+		\caption{Rational quadratic covariances}
+		\label{fig:RQ_cov}
+	\end{subfigure}
+	\begin{subfigure}[b]{7cm}
+		\psfragfig[height = 2cm, width = 7cm]{figures/our_cov}
+		\caption{Marginal homogenous exponential covariances}
+		 \label{fig:our_cov}
+	\end{subfigure}
+\caption{The different priors assumed by {\scshape rq} and {\scshape mhe} covariances give rise to different behaviours as the variance in the input scale ($\Lambda$) increases. The priors of \subref{fig:gamma_prior} assign more weight to very large input scales, whereas the priors of \subref{fig:log_normal_prior} assign more weight to small input scales. All figures have $\nu = 1$ and share the legends of \subref{fig:gamma_prior}) and \subref{fig:our_cov}).}
+\label{fig:rq_vs_our_cov}
+\end{figure}
 
 
 \subsubsection{Proof of Positive Semi-Definiteness}
