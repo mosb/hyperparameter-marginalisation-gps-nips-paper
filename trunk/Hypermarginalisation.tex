@@ -64,7 +64,10 @@ Kernel and covariance functions are often parameterised by hyperparameters, unkn
 
 Kernel and covariance functions are vital to much of machine learning and data mining \citep{shawe2004kernel}. In this paper, we consider Gaussian process \citep{rassandwill} inference, which has at its heart just such a covariance function. The hyperparameters that define such functions are rarely known {\it a-priori}. Given training data, these hyperparameters are often set by type-II maximum likelihood, which can lead to overfitting. A more rigorous alternative is to integrate over, or marginalise, the hyperparameters, which is unfortunately usually intractable. While sampling approaches \citep{neal1997monte} have been developed to address this problem, they are prohibitively computationally expensive for large numbers of hyperparameters. 
 
-We introduce a Laplace approach to approximately marginalise covariance hyperparameters. This gives us a robust family of covariances that are tolerant to uncertainty in the hyperparameters. Our method is particularly appropriate when such uncertainty is likely to be significant, as when only small amounts of data are available. We are motivated by scenarios where obtaining data is expensive (computationally or otherwise), such as in global optimisation \citep{osborne2009gaussian}. 
+We introduce a novel approximation to hyperparameter marginalisation in which we represent the
+marginal 
+
+We introduce a Laplace approach to approximately marginalise covariance hyperparameters. This gives us a robust family of covariances that are tolerant to uncertainty in the hyperparameters. Our method is particularly appropriate when such uncertainty is likely to be significant, as when only small amounts of data are available. We are motivated by scenarios where obtaining data is expensive (computationally or otherwise), such as in global optimisation \citep{osborne2009gaussian,reece11}. 
 
 
 % \jansays{In Bayesian methods a common problem is to choose a prior. In inference with Gaussian processes this task could involve choosing kernel function hyperparameters. In practice however, it is often unclear how to make this choice a priori. Therefore, most implementations deviate from proper Bayesian treatment by estimating the hyperparameters from the data via maximum lmarginal-ikelihood methods. In contrast, we propose to add another hierarchy of inference on top of that. In particular, we propose to place a prior distribution over the hyperparameters. Its hyperparemeters can in turn be estimated learned from the data. Since the resuting integrals of the marginalizations are non-analytic we use a Taylor expansion to yield a Gaussian process which approximates the correct process with marginalized hyperparameters.
@@ -94,7 +97,7 @@ p(y | f, x, \sigma_n^2) := \mathcal{N}(y; f, \sigma_n^2)
 \end{equation} 
 which represents i.i.d Gaussian observation noise with variance $\sigma_n^2$. As should be expected, the predictive distribution over $f_*$ is Gaussian:
 \begin{equation}\label{posteriorpred}
-p(f_* | x_*, \yd,\bm{\theta}) := \mathcal{N} ( f_* ; m_\theta(f_* | x_*, \yd), C_\theta(f_* | x_*, \yd))
+p(f_* | x_*,\yd,\bm{\theta}) := \mathcal{N} ( f_* ; m_\theta(f_* | x_*, \yd), C_\theta(f_* | x_*, \yd))
 \end{equation}
 where the posterior mean and covariance are:
 \begin{align}
@@ -147,26 +150,45 @@ As per Figure \ref{fig:ML}, \eqref{eq:ML} is equivalent to approximating the lik
 \label{fig:periodic_likelihood}
 \end{figure}
 
-We now present a computationally inexpensive approach to approximately marginalising hyperparameters.
+\section{Generalised Exponential Covariance Functions} 
+ 
+We consider the general form of covariance, which we term the {\it Generalised exponential} (GE)
+\begin{equation}\label{eq:he} 
+K_\theta(x,x^\prime) = h^2 \exp \left( -\frac{1}{2} \frac{\bigtriangleup^2}{L^2} \right)\,,
+\end{equation} 
+where $h$ is a scaling parameter termed the \emph{output scale}, and $L$ is the \emph{length scale}; the vector  $\bm{\theta}$ contains both hyperparameters. This form captures many of the most commonly used covariance functions. If $\bigtriangleup^2 = \sum_i (x_i - x_i^\prime)^2$, \eqref{eq:he} becomes the ubquitous  \emph{squared exponential}. If $\bigtriangleup^2 = |x-x'|$,  \eqref{eq:he} is the exponential covariance. Many other covariances can be constructed by taking $\bigtriangleup^2$ as other metrics, allowing for periodic covariances, warpings of the input space \citep{snelson2004warped} and inference in more structured domains \citep{garnett2010bayesian}.
+ 
+The output scale $h$ can be tractably marginalised according to suitable priors \citep{kennedy1998bayesian}. Even if performing type-II maximum likelihood, the output scale is usually well-specified by even a moderate amount of data. We will not consider this hyperparameter further. 
+ 
+The length scale $L$ affects how closely outputs co-vary as a function of $\bigtriangleup^2$. Our predictions will ultimately be very sensitive to the value of the length scale; a short length scale will favour rough functions, a long length scale will favour smoother functions. Unfortunately, the likelihood of the length scale is often highly multi-modal: Figure \ref{fig:periodic_likelihood} illustrates the likelihood surface as a function of $\theta = L$ for a periodic covariance, where the multiple modes correspond to harmonics of the latent period and sampling frequency. That is, given limited data, the posterior for the input scale is likely to have large variance. As such, type-II maximum likelihood for this hyperparameter will lead to problematic over-fitting. 
+
+ We now present a computationally inexpensive approach to approximately marginalising hyperparameters.
 
 %------- APPROXIMATE HYPERPARAMETER MARGINALISATION --------
 \section{Approximate Hyperparameter Marginalisation}
 
-We now propose a general-purpose family of covariance functions that result from approximately marginalising the hyperparameters of an homogenous exponential covariance. 
+In this section we introduce an approximate method for performing inference, using a Gaussian process, which accommodates the inherent uncertainty one should have about the value of hyperparameters, but which does not suffer from excessive computational expense. Rather than attempt to approximate the integral in (\ref{fullmargint}), we present a novel approach which uses a modified prior that incorporates and marginalises the uncertainty in the hyperparameters \emph{before} it is fused with observations. The result is an adjusted covariance function which can be used interchangeably with a standard covariance function in {\scshape gp} inference. % but whose parameters are now \emph{hyper-hyperparameters} explaining the marginalised covariance function.
 
-% In this section we introduce an approximate method for performing inference, using a Gaussian process, which accommodates the inherent uncertainty one should have about the value of hyperparameters, but which does not suffer from excessive computational expense. Rather than attempt to approximate the integral in (\ref{fullmargint}), we present a novel approach which uses a modified prior that incorporates and marginalises the uncertainty in the hyperparameters \emph{before} it is fused with observations. The result is an adjusted covariance function which can be used interchangeably with a standard covariance function in {\scshape gp} inference, but whose parameters are now \emph{hyper-hyperparameters} explaining the marginalised covariance function.
+\subsection{Approximate Hyperparameter Priors}
 
-\subsection{Generalised Exponential Covariance Functions} 
-
-We consider the general form of covariance, which we term the {\it homogenous exponential}
-\begin{equation}\label{eq:he}
-K_\theta(x,x^\prime) = h^2 \exp \left( -\frac{1}{2} \frac{\bigtriangleup^2}{L^2} \right)\,,
+The prior distribution over $\mathbf{f}$ is generally a non-Gaussian distribution:
+\begin{equation}
+p(\mathbf{f}\mid \mathbf{x}) = \int_\theta p(\mathbf{f}\mid \bm{\theta}) p(\bm{\theta}) d\bm{\theta}\ .
 \end{equation}
-where $h$ is a scaling parameter termed the \emph{output scale}, and $L$ is the \emph{length scale}; the vector $\bm{\theta}$ contains both hyperparameters. This form captures many of the most commonly used covariance functions. If $\bigtriangleup^2 = \sum_i (x_i - x_i^\prime)^2$, \eqref{eq:he} becomes the ubquitous \emph{squared exponential}. If $\bigtriangleup^2 = |x-x'|$,  \eqref{eq:he} is the exponential covariance. Many other covariances can be constructed by taking $\bigtriangleup^2$ as other metrics, allowing for periodic covariances, warpings of the input space \citep{snelson2004warped} and inference in more structured domains \citep{garnett2010bayesian}.
+We aim to approximate $p(\mathbf{f}\mid \mathbf{x})$ by a Gaussian distribution 
+$\tilde{p}(\mathbf{f}\mid \mathbf{x})$ by matching the first two moments of 
+$p(\mathbf{f}\mid \mathbf{x})$ and $\tilde{p}(\mathbf{f}\mid \mathbf{x})$:
+\begin{equation}
+\tilde{p}(\mathbf{f}\mid \mathbf{x})=\mathcal{N}(\mu(\mathbf{x}),K(\mathbf{x},\mathbf{x}))
+\end{equation}
+where $\mu$ is the mean of a Gaussian process and $K$ is its covariance function.  To clarify the presentation we assume that the mean of $p(\mathbf{f}\mid \bm{\theta})$ is zero for all $\bm{\theta}$ although our approach can be extended to the non-zero mean case.  Thus, the mean, $\mu$, of $\tilde{p}(f)$ is also zero and the covariance of $\tilde{p}(\mathbf{f})$ is the second moment of $p(\mathbf{f})$:
+\begin{align}
+K(\mathbf{x},\mathbf{x})&=\int_\theta \left[\int_{\mathbf{f}} \mathbf{f}\  \mathbf{f}^T p(\mathbf{f}\mid \bm{\theta}) p(\bm{\theta}) d\mathbf{f} \right] d\bm{\theta}\\
+&=\int_\theta K_{\bm{\theta}}(\mathbf{x},\mathbf{x}) p(\bm{\theta}) d\bm{\theta}
+\end{align}
+where $K_{\bm{\theta}}$ is the covariance function for $\mathbf{f}$ with hyperparameters $\bm{\theta}$.
 
-The output scale $h$ can be tractably marginalised according to suitable priors \citep{kennedy1998bayesian}. Even if performing type-II maximum likelihood, the output scale is usually well-specified by even a moderate amount of data. We will not consider this hyperparameter further. 
-
-The length scale $L$ affects how closely outputs co-vary as a function of $\bigtriangleup^2$. Our predictions will ultimately be very sensitive to the value of the length scale; a short length scale will favour rough functions, a long length scale will favour smoother functions. Unfortunately, the likelihood of the length scale is often highly multi-modal: Figure \ref{fig:periodic_likelihood} illustrates the likelihood surface as a function of $\theta = L$ for a periodic covariance, where the multiple modes correspond to harmonics of the latent period and sampling frequency. That is, given limited data, the posterior for the input scale is likely to have large variance. As such, type-II maximum likelihood for this hyperparameter will lead to problematic over-fitting. 
+We now propose a general-purpose family of covariance functions that result from approximately marginalising the hyperparameters of an homogenous exponential covariance. 
 
 \subsection{Marginal Generalised Exponential Covariance Function} \mikesays{now we talk about our covariance, which I've called Marginal Generalised Exponential covariances}
 
@@ -195,9 +217,9 @@ As stated before, we marginalise out the uncertainty in $\beta$ (or $L$), before
 \jansays{Perhaps we should talk about the moment matching idea first.. As far as I can remember: Ie taylor expand the marginalized process ... it then turns out the the kernel of the matched process equals the marginalized kernel you write down in (14) below..}
 
 The marginalised kernel is calculated by evaluating the following integral:
-\begin{equation} \label{kernelmargint}
+\begin{equation} \label{kernelmargint} 
 K_{\nu,\Lambda} = \int_{-\infty}^{+\infty} K_\beta \; p(\beta|\nu,\Lambda) d\beta
-\end{equation}
+\end{equation} 
 which is non-analytic given the current form of $K_\beta$. We approximate the solution to the integral by first approximating $K_\beta$ using a second-order Taylor expansion around the mean of $p(\beta)$ given by $\nu$. In order to ensure that the approximate kernel is positive semi-definite we force $K_\beta$ to be in exponential form, hence we note the following identity and substitution:
 \begin{align}
 K_\beta &= \exp \left( -\ln \frac{1}{K_\beta} \right) \nonumber\\ 
@@ -261,7 +283,7 @@ the log-Gaussian prior dominates the inverse gamma prior
 	\end{subfigure}
 	\begin{subfigure}[b]{7cm}
 		\psfragfig[height = 2cm, width = 7cm]{figures/our_cov}
-		\caption{Marginal homogenous exponential covariances}
+		\caption{Marginal generalised exponential covariances}
 		 \label{fig:our_cov}
 	\end{subfigure}
 \caption{The different priors assumed by {\scshape rq} and {\scshape mhe} covariances give rise to different behaviours as the variance in the input scale ($\Lambda$) increases. The priors of \subref{fig:gamma_prior} assign more weight to very large input scales, whereas the priors of \subref{fig:log_normal_prior} assign more weight to small input scales. All figures have $\nu = 1$ and share the legends of \subref{fig:gamma_prior}) and \subref{fig:our_cov}).}
