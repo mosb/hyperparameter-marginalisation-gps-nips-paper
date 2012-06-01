@@ -2,9 +2,10 @@ This is BibTeX, Version 0.99c (TeX Live 2009/Debian)
 The top-level auxiliary file: Hypermarginalisation.aux
 The style file: plain.bst
 Database file #1: Hypermarginalisation.bib
+Warning--I didn't find a database entry for "reece11"
 You've used 10 entries,
             2118 wiz_defined-function locations,
-            555 strings with 5531 characters,
+            556 strings with 5538 characters,
 and the built_in function-call counts, 3300 in all, are:
 = -- 319
 > -- 163
@@ -43,3 +44,4 @@ warning$ -- 0
 while$ -- 32
 width$ -- 12
 write$ -- 108
+(There was 1 warning)
