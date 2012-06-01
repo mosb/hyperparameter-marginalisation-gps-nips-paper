@@ -17,6 +17,8 @@
 \newcommand{\vect}[1]{\mathbf{#1}}
 \newcommand{\xd}{\vect{x}}
 \newcommand{\yd}{\vect{y}}
+\renewcommand{\sc}[1]{{\scshape #1}}
+\newcommand{\tK}{\tilde{K}}
 
 \DeclareMathOperator*{\argmax}{\arg\!\max\!}
 
@@ -64,8 +66,8 @@ Kernel and covariance functions are often parameterised by hyperparameters, unkn
 
 Kernel and covariance functions are vital to much of machine learning and data mining \citep{shawe2004kernel}. In this paper, we consider Gaussian process \citep{rassandwill} inference, which has at its heart just such a covariance function. The hyperparameters that define such functions are rarely known {\it a-priori}. Given training data, these hyperparameters are often set by type-II maximum likelihood, which can lead to overfitting. A more rigorous alternative is to integrate over, or marginalise, the hyperparameters, which is unfortunately usually intractable. While sampling approaches \citep{neal1997monte} have been developed to address this problem, they are prohibitively computationally expensive for large numbers of hyperparameters. 
 
-We introduce a novel approximation to hyperparameter marginalisation in which we represent the
-marginal 
+% We introduce a novel approximation to hyperparameter marginalisation in which we represent the
+% marginal 
 
 We introduce a Laplace approach to approximately marginalise covariance hyperparameters. This gives us a robust family of covariances that are tolerant to uncertainty in the hyperparameters. Our method is particularly appropriate when such uncertainty is likely to be significant, as when only small amounts of data are available. We are motivated by scenarios where obtaining data is expensive (computationally or otherwise), such as in global optimisation \citep{osborne2009gaussian,reece11}. 
 
@@ -78,31 +80,30 @@ We introduce a Laplace approach to approximately marginalise covariance hyperpar
 %------- GAUSSIAN PROCESSES--------
 \section{Gaussian Processes}
 
-Gaussian processes ({\scshape gp}s) constitute a powerful method for performing Bayesian inference about functions using a limited set of observations \cite{rassandwill}. A {\scshape gp} is defined as a distribution over the functions $f : \mathcal{X} \rightarrow \mathbb{R}$ such that the distribution over the possible function values on any finite set of $\mathcal{X}$ is multi-variate Gaussian.
-%One can imagine a point $x_i \in \mathcal{X}$ as having an associated random variable $Y_i$ representing the possible values the function can take at that point, the {\scshape gp} is therefore the infinite set of such random variables defined across the domain of the function. If we take a sample from a {\scshape gp} at a finite set of input locations $\mathbf{x} = \{x_1,...,x_n\}$, the corresponding observations $\mathbf{y} = \{ y_1,...,y_n\}$ can be viewed as a single point sampled from some multi-variate Gaussian distribution.
+Gaussian processes (\sc{gp}s) constitute a powerful method for performing Bayesian inference about functions using a limited set of observations \cite{rassandwill}. A \sc{gp} is defined as a distribution over the functions $f : \mathcal{X} \rightarrow \mathbb{R}$ such that the distribution over the possible function values on any finite set of $\mathcal{X}$ is multi-variate Gaussian.
+%One can imagine a point $x_i \in \mathcal{X}$ as having an associated random variable $Y_i$ representing the possible values the function can take at that point, the \sc{gp} is therefore the infinite set of such random variables defined across the domain of the function. If we take a sample from a \sc{gp} at a finite set of input locations $\mathbf{x} = \{x_1,...,x_n\}$, the corresponding observations $\mathbf{y} = \{ y_1,...,y_n\}$ can be viewed as a single point sampled from some multi-variate Gaussian distribution.
 
-A {\scshape gp} is completely defined by its first and second moments: a mean function $\mu : \mathcal{X} \rightarrow \mathbb{R}$, which describes the overall trend of the function, and a positive semidefinite covariance function, or kernel, $K : \mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}$ which describes how function values are correlated as a function of their locations in the domain. Given a function $f : \mathcal{X} \rightarrow \mathbb{R}$ about which we wish to perform inference and a set of input points $\mathbf{x} \subseteq \mathcal{X}$, the Gaussian process prior distribution over the function values $\mathbf{f} = f(\mathbf{x})$ is given by:
-\begin{align}
-p(\mathbf{f} | \mathbf{x},\bm{\theta},I) &:= \mathcal{N}\left( \mathbf{f};\mu_\theta(\mathbf{x}),K_\theta(\mathbf{x},\mathbf{x}) \right) \nonumber \\
-&:= \frac{1}{\sqrt{\mathrm{det} 2 \pi K_{\mathbf{f}}} } \exp \left( - \frac{1}{2} (\mathbf{f}-\mu_{\mathbf{f}})^\top K_\mathbf{f}^{-1} (\mathbf{f}-\mu_{\mathbf{f}})  \right)
-\end{align}
-where $\bm{\theta}$ is a vector containing any parameters required by $\mu$ and $K$: the \emph{hyperparameters} of the model, $I$. Due to the ubiquity of $I$ we henceforth drop it from explicit representation for notational convenience. %The context, $I$, forms the background knowledge upon which all our probabilities are conditioned. Its ubiquity leads us to henceforth drop it from explicit representation.
-There exist a wide variety of mean and covariance functions which can be chosen in order to reflect any prior knowledge available about the function of interest. 
-%Note also that we need not place a {\scshape gp} directly on the function, for example a function known to be strictly positive might benefit from a {\scshape gp} over its logarithm.
+A \sc{gp} is completely defined by its first and second moments: a mean function $\mu : \mathcal{X} \rightarrow \mathbb{R}$, which describes the overall trend of the function, and a positive semidefinite covariance function, or kernel, $K : \mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}$ which describes how function values are correlated as a function of their locations in the domain. Given a function $f : \mathcal{X} \rightarrow \mathbb{R}$ about which we wish to perform inference and a set of input points $\mathbf{x} \subseteq \mathcal{X}$, the Gaussian process prior distribution over the function values $\mathbf{f} = f(\mathbf{x})$ is given by:
+\begin{equation}
+p(\mathbf{f} | \mathbf{x},\bm{\theta}) := \mathcal{N}\left( \mathbf{f};\mu_\theta(\mathbf{x}),K_\theta(\mathbf{x},\mathbf{x}) \right) \nonumber:= \frac{1}{\sqrt{\mathrm{det} 2 \pi K_{\mathbf{f}}} } \exp \left( - \frac{1}{2} (\mathbf{f}-\mu_{\mathbf{f}})^\top K_\mathbf{f}^{-1} (\mathbf{f}-\mu_{\mathbf{f}})  \right)
+\end{equation}
+where $\bm{\theta}$ is a vector containing any parameters required by $\mu$ and $K$.
+There exist a wide variety of mean and covariance functions which can be chosen in order to reflect any prior knowledge available about the function of interest. We'll henceforth assume that inputs such as $\mathbf{x}$ are always known; they'll be dropped from explicit representation.  
+%Note also that we need not place a \sc{gp} directly on the function, for example a function known to be strictly positive might benefit from a \sc{gp} over its logarithm.
 
 %Observations
 A vector of observations $\mathbf{y} = \{ y_1,...,y_n\}$ could be viewed as a single point sampled from a $n$-variate Gaussian distribution. Once we have observations of the function $(\mathbf{x_s},\yd)$ we can make predictions about the function value $f_*$ at input $x_*$. As exact measurements of the function are often not available we assume a noise model, such that:
 \begin{equation}\label{obsnoise}
-p(y | f, x, \sigma_n^2) := \mathcal{N}(y; f, \sigma_n^2)
+p(y | f, \sigma_n^2) := \mathcal{N}(y; f, \sigma_n^2)
 \end{equation} 
 which represents i.i.d Gaussian observation noise with variance $\sigma_n^2$. As should be expected, the predictive distribution over $f_*$ is Gaussian:
 \begin{equation}\label{posteriorpred}
-p(f_* | x_*,\yd,\bm{\theta}) := \mathcal{N} ( f_* ; m_\theta(f_* | x_*, \yd), C_\theta(f_* | x_*, \yd))
+p(f_* | \yd,\bm{\theta}) := \mathcal{N} ( f_* ; m_\theta(f_* | \yd), C_\theta(f_* | \yd))
 \end{equation}
 where the posterior mean and covariance are:
 \begin{align}
-m_\theta(f_* | x_*, \yd) := \mu_\theta(x_*) + K_\theta(x_*,\xd)V^{-1}(\yd - \mu_\theta(x_*))\\
-C_\theta(f_* | x_*, \yd) := K_\theta(x_*,x_*) - K_\theta(x_*,\xd)V^{-1}K_\theta(\xd,x_*)
+m_\theta(f_* | \yd) := \mu_\theta(x_*) + K_\theta(x_*,\xd)V^{-1}(\yd - \mu_\theta(x_*))\\
+C_\theta(f_* | \yd) := K_\theta(x_*,x_*) - K_\theta(x_*,\xd)V^{-1}K_\theta(\xd,x_*)
 \end{align}
 where $V := K_\theta(\xd,\xd) + \sigma_n^2\mathbf{I}$.
 
@@ -110,30 +111,30 @@ where $V := K_\theta(\xd,\xd) + \sigma_n^2\mathbf{I}$.
 %Marginalisation
 The previous equations assume that the hyperparameters $\bm{\theta}$ are known; in fact we can rarely be certain about $\bm{\theta}$ \emph{a priori}. This ignorance can be represented by a suitably uninformative prior distribution $p(\bm{\theta})$. Given such a \emph{hyper-prior}, the hyperparameters can be marginalised to calculate the predictive distribution over $f_*$:
 \begin{equation}\label{fullmargint}
-p(f_* |x_*, \yd) = \frac{\int p(f_* | x_*, \yd,\bm{\theta})p(\yd|\xd,\bm{\theta})p(\bm{\theta})d\bm{\theta}}{\int p(\yd|\xd,\bm{\theta})p(\bm{\theta})d\bm{\theta}}
+p(f_* |\yd) = \frac{\int p(f_* | \yd,\bm{\theta})p(\yd|\bm{\theta})p(\bm{\theta})d\bm{\theta}}{\int p(\yd|\bm{\theta})p(\bm{\theta})d\bm{\theta}}
 \end{equation}
 Unfortunately, such integrals are generally non-analytic, requiring numerical approximation. Randomized Monte Carlo techniques \cite{chen2000monte} form the most popular approaches to numerical integration, although Bayesian alternatives \cite{bayesquad, osbornebayesquad} also exist. 
 These techniques estimate the integral given
 the value of the integrand on a set of sample points, usually via a weighted mixture
 \begin{equation}\label{sampling}
-p(f_* |x_*, \yd) \simeq \sum_i \rho_i p(f_* | x_*, \yd,\bm{\theta}_i)
+p(f_* |\yd) \simeq \sum_i \rho_i p(f_* | \yd,\bm{\theta}_i)
 \end{equation}
-for some weight vector $\bm{\rho}$. Unfortunately, the computational expense of evaluating the integrand at sufficient samples to estimate high-dimensional integrals is often prohibitive. %As a consequence, such approaches are rarely used for the marginalisation of {\scshape gp} hyperparameters. 
+for some weight vector $\bm{\rho}$. Unfortunately, the computational expense of evaluating the integrand at sufficient samples to estimate high-dimensional integrals is often prohibitive. %As a consequence, such approaches are rarely used for the marginalisation of \sc{gp} hyperparameters. 
 %\jansays{IS THIS CORRECT? OR, IS IT BECAUSE IT IS HARD  TO SPECIFY A PRIOR AND SINCE PEOPLE ARE LAZY ?}
 % you're not going to win people over by calling them lazy
 
 A less computationally demanding alternative is to select only a single sample. Type II maximum likelihood, or maximum marginal likelihood, approximates as
 \begin{equation} \label{eq:ML}
-p(f_* |x_*, \yd) \simeq p(f_* | x_*, \yd,\bm{\theta}_{\mathrm{ML}})
+p(f_* |\yd) \simeq p(f_* | \yd,\bm{\theta}_{\mathrm{ML}})
 \end{equation}
 %\begin{equation}\label{marglikelihood}
 %p(\yd | \xd, \bm{\theta}) = \int p(\yd | \mathbf{f},\xd, \bm{\theta})p(\mathbf{f} | \mathbf{x},\bm{\theta}) d\mathbf{f}
 %\end{equation}
 where $\bm{\theta}_{\mathrm{ML}}$ is the hyperparameter vector that maximises the marginal likelihood, 
 \begin{equation}
-\bm{\theta}_{\mathrm{ML}} = \argmax_{\bm{\theta}} \;\; p(\yd|\xd,\bm{\theta})
+\bm{\theta}_{\mathrm{ML}} = \argmax_{\bm{\theta}} \;\; p(\yd|\bm{\theta})
 \end{equation}
-As per Figure \ref{fig:ML}, \eqref{eq:ML} is equivalent to approximating the likelihood $p(\yd|\xd,\bm{\theta})$ as the delta function $\delta(\theta - \theta_{\mathrm{ML}})$. This assumption is a poor representation of our true state of ignorance given only low numbers of data, for which the likelihood is typically broad and/or multi-modal. As a consequence, type II maximum likelihood can often lead to over-fitting. Nonetheless, the less onerous computational requirements of this approach have made it ubiquitous throughout machine learning. 
+As per Figure \ref{fig:ML}, \eqref{eq:ML} is equivalent to approximating the likelihood $p(\yd|\bm{\theta})$ as the delta function $\delta(\theta - \theta_{\mathrm{ML}})$. This assumption is a poor representation of our true state of ignorance given only low numbers of data, for which the likelihood is typically broad and/or multi-modal. As a consequence, type II maximum likelihood can often lead to over-fitting. Nonetheless, the less onerous computational requirements of this approach have made it ubiquitous throughout machine learning. 
 
 \begin{figure}
 	\begin{subfigure}[b]{7cm}
@@ -146,7 +147,7 @@ As per Figure \ref{fig:ML}, \eqref{eq:ML} is equivalent to approximating the lik
 	  \caption{}
 	  \label{fig:MCMC}
 	\end{subfigure}
-\caption{\subref{fig:ML}) Samples (black dots) obtained by optimising the log-likelihood (grey) using a global optimiser, and in blue, the maximum likelihood approximation of the likelihood surface. \subref{fig:MCMC}) Samples obtained by taking draws from the posterior using an {\scshape mcmc} method.}
+\caption{\subref{fig:ML}) Samples (black dots) obtained by optimising the log-likelihood (grey) using a global optimiser, and in blue, the maximum likelihood approximation of the likelihood surface. \subref{fig:MCMC}) Samples obtained by taking draws from the posterior using an \sc{mcmc} method.}
 \label{fig:periodic_likelihood}
 \end{figure}
 
@@ -162,45 +163,39 @@ The output scale $h$ can be tractably marginalised according to suitable priors 
  
 The length scale $L$ affects how closely outputs co-vary as a function of $\bigtriangleup^2$. Our predictions will ultimately be very sensitive to the value of the length scale; a short length scale will favour rough functions, a long length scale will favour smoother functions. Unfortunately, the likelihood of the length scale is often highly multi-modal: Figure \ref{fig:periodic_likelihood} illustrates the likelihood surface as a function of $\theta = L$ for a periodic covariance, where the multiple modes correspond to harmonics of the latent period and sampling frequency. That is, given limited data, the posterior for the input scale is likely to have large variance. As such, type-II maximum likelihood for this hyperparameter will lead to problematic over-fitting. 
 
- We now present a computationally inexpensive approach to approximately marginalising hyperparameters.
+ We now present a computationally cheap means of approximately marginalising hyperparameters.
 
 %------- APPROXIMATE HYPERPARAMETER MARGINALISATION --------
 \section{Approximate Hyperparameter Marginalisation}
 
-In this section we introduce an approximate method for performing inference, using a Gaussian process, which accommodates the inherent uncertainty one should have about the value of hyperparameters, but which does not suffer from excessive computational expense. Rather than attempt to approximate the integral in (\ref{fullmargint}), we present a novel approach which uses a modified prior that incorporates and marginalises the uncertainty in the hyperparameters \emph{before} it is fused with observations. The result is an adjusted covariance function which can be used interchangeably with a standard covariance function in {\scshape gp} inference. % but whose parameters are now \emph{hyper-hyperparameters} explaining the marginalised covariance function.
+In this section we introduce an approximate method for performing inference, using a Gaussian process, which accommodates the inherent uncertainty one should have about the value of hyperparameters, but which does not suffer from excessive computational expense. Rather than attempt to approximate the integral in (\ref{fullmargint}), we present a novel approach which uses a modified prior that incorporates and marginalises the uncertainty in the hyperparameters \emph{before} it is fused with observations. The result is an adjusted covariance function which can be used interchangeably with a standard covariance function in \sc{gp} inference. % but whose parameters are now \emph{hyper-hyperparameters} explaining the marginalised covariance function.
 
 \subsection{Approximate Hyperparameter Priors}
 
 The prior distribution over $\mathbf{f}$ is generally a non-Gaussian distribution:
 \begin{equation}
-p(\mathbf{f}\mid \mathbf{x}) = \int_\theta p(\mathbf{f}\mid \bm{\theta}) p(\bm{\theta}) d\bm{\theta}\ .
+p(\mathbf{f}) = \int_\theta p(\mathbf{f}\mid \bm{\theta}) p(\bm{\theta}) d\bm{\theta}\ .
 \end{equation}
-We aim to approximate $p(\mathbf{f}\mid \mathbf{x})$ by a Gaussian distribution 
-$\tilde{p}(\mathbf{f}\mid \mathbf{x})$ by matching the first two moments of 
-$p(\mathbf{f}\mid \mathbf{x})$ and $\tilde{p}(\mathbf{f}\mid \mathbf{x})$:
+We aim to approximate $p(\mathbf{f})$ by a Gaussian distribution 
+$\tilde{p}(\mathbf{f})$ by matching the first two moments of 
+$p(\mathbf{f})$ and $\tilde{p}(\mathbf{f}\mid \mathbf{x})$:
 \begin{equation}
-\tilde{p}(\mathbf{f}\mid \mathbf{x})=\mathcal{N}(\mu(\mathbf{x}),K(\mathbf{x},\mathbf{x}))
+\tilde{p}(\mathbf{f})=\mathcal{N}(\tilde{\mu}(\mathbf{x}),\tK(\mathbf{x},\mathbf{x}))
 \end{equation}
 where $\mu$ is the mean of a Gaussian process and $K$ is its covariance function.  To clarify the presentation we assume that the mean of $p(\mathbf{f}\mid \bm{\theta})$ is zero for all $\bm{\theta}$ although our approach can be extended to the non-zero mean case.  Thus, the mean, $\mu$, of $\tilde{p}(f)$ is also zero and the covariance of $\tilde{p}(\mathbf{f})$ is the second moment of $p(\mathbf{f})$:
-\begin{align}
-K(\mathbf{x},\mathbf{x})&=\int_\theta \left[\int_{\mathbf{f}} \mathbf{f}\  \mathbf{f}^T p(\mathbf{f}\mid \bm{\theta}) p(\bm{\theta}) d\mathbf{f} \right] d\bm{\theta}\\
-&=\int_\theta K_{\bm{\theta}}(\mathbf{x},\mathbf{x}) p(\bm{\theta}) d\bm{\theta}
-\end{align}
+\begin{equation}
+\tK(\mathbf{x},\mathbf{x})=\int_\theta \left[\int_{\mathbf{f}} \mathbf{f}\  \mathbf{f}^T p(\mathbf{f}\mid \bm{\theta}) p(\bm{\theta}) d\mathbf{f} \right] d\bm{\theta}=\int_\theta K_{\bm{\theta}}(\mathbf{x},\mathbf{x}) p(\bm{\theta}) d\bm{\theta}
+\end{equation}
 where $K_{\bm{\theta}}$ is the covariance function for $\mathbf{f}$ with hyperparameters $\bm{\theta}$.
 
 We now propose a general-purpose family of covariance functions that result from approximately marginalising the hyperparameters of an homogenous exponential covariance. 
 
-\subsection{Marginal Generalised Exponential Covariance Function} \mikesays{now we talk about our covariance, which I've called Marginal Generalised Exponential covariances}
-
-
-
+\subsection{Marginal Generalised Exponential Covariance Function}\label{sec:MGE} 
 
 We propose to marginalise $L$ (which is strictly positive) according to a Gaussian prior to its logarithm, $\beta := \log(L)$;
 % \begin{equation}
 %  
 % \end{equation}
-
-
  and define a Gaussian distribution over $\beta$ so that $p(L)$ will have strictly positive support: 
 \begin{equation}\label{betaSEkernel}
 K_\theta(x,x^\prime) = h^2 \exp \left( -\frac{1}{2}\bigtriangleup^2 \exp(-2\beta) \right)
@@ -213,8 +208,6 @@ p(\beta|\nu,\Lambda) &= \mathcal{N}(\beta; \nu, \Lambda) \nonumber\\
 where $\nu$ and $\Lambda$ are hyper-hyperparmeters.
 
 As stated before, we marginalise out the uncertainty in $\beta$ (or $L$), before fusing the prior with observations. 
-
-\jansays{Perhaps we should talk about the moment matching idea first.. As far as I can remember: Ie taylor expand the marginalized process ... it then turns out the the kernel of the matched process equals the marginalized kernel you write down in (14) below..}
 
 The marginalised kernel is calculated by evaluating the following integral:
 \begin{equation} \label{kernelmargint} 
@@ -256,13 +249,13 @@ This result is a new kernel which is the product of the original kernel $K_\beta
 
 \subsection{Rational Quadratic Covariance Function} 
 
-The Rational Quadratic covariance function represents one means of approximately marginalising the input scale of a squared exponential covariance. It assumes a gamma prior, which, problematically, puts excessive weight on very large input scales when we are very uncertain. See Figure \ref{fig:rq_vs_our_cov}.
-
-the log-Gaussian prior dominates the inverse gamma prior
-
+The Rational Quadratic (\sc{rq}) covariance function 
 \begin{equation}
+ K'_\phi = \left(1 + \frac{\Delta^2}{2 \alpha L^2} \right)^{-\alpha} = \int_L K_{L}(\mathbf{x},\mathbf{x}) p(\bm{\theta}) d\bm{\theta}
 \end{equation}
+represents an alternative means of approximately marginalising the input scale of a squared exponential covariance. Where the approach of Section \ref{sec:MGE} adopted a log-Gaussian prior for the length scales, the \sc{rq} assumes a gamma prior on the inverse squared length scales. Problematically, this puts excessive weight on very large input scales (see Figure \ref{fig:rq_vs_our_cov}) -- the \sc{mge} dominates the \sc{rq} for sufficiently small length scales. Figure \ref{fig:RQ_cov} shows that as the variance of the gamma prior increases, the \sc{rq} covariance gets increasingly broad, favouring an interpretation of the data as being constant. On the other hand, the \sc{mge} covariance becomes increasingly tight as its associated variance increases, favouring an interpretation of the data as being \sc{iid}. We argue that the latter is preferable: if we are truly ignorant about the length scales, assuming that all data is uncorrelated is more reasonable than assuming that it is all perfectly correlated. 
 
+To provide an alternative intuition, imagine performing type II maximum likelihood on a small training set to train the length scales of a squared exponential covariance. If the test set is well-modelled by length scales significantly smaller than the trained length scales, the \sc{rq} is likely to perform poor prediction relative to the \sc{mge}.
 
 \begin{figure}
 	\begin{subfigure}[b]{7cm}
@@ -286,7 +279,7 @@ the log-Gaussian prior dominates the inverse gamma prior
 		\caption{Marginal generalised exponential covariances}
 		 \label{fig:our_cov}
 	\end{subfigure}
-\caption{The different priors assumed by {\scshape rq} and {\scshape mhe} covariances give rise to different behaviours as the variance in the input scale ($\Lambda$) increases. The priors of \subref{fig:gamma_prior} assign more weight to very large input scales, whereas the priors of \subref{fig:log_normal_prior} assign more weight to small input scales. All figures have $\nu = 1$ and share the legends of \subref{fig:gamma_prior}) and \subref{fig:our_cov}).}
+\caption{The different priors assumed by \sc{rq} and \sc{mhe} covariances give rise to different behaviours as the variance in the input scale ($\Lambda$) increases. The priors of \subref{fig:gamma_prior} assign more weight to very large input scales, whereas the priors of \subref{fig:log_normal_prior} assign more weight to small input scales. All figures have $\nu = 1$ and share the legends of \subref{fig:gamma_prior}) and \subref{fig:our_cov}).}
 \label{fig:rq_vs_our_cov}
 \end{figure}
 
@@ -325,9 +318,9 @@ We note that the product of kernels is also a kernel. Both exponentials in (\ref
 
 \subsection{Posterior functions with differing length scales}
 
-When using standard kernels, functions drawn from the prior will have a fixed length scale; when using our kernel, the length scale of functions drawn from the prior can take a number a range of values as a result of the distribution over length scales. When our prior is fused with observations to form a posterior {\scshape gp}, we are able to describe functions that may have generated the observations over a range of length scales. When data is limited this is particularly crucial as a whole range of length scales may be permissible with regards to the data generated, even if one is favoured through type-II maximum likelihood methods. As data increases the range of permissible length scales reduces, eventually collapsing to the true length scale.
+When using standard kernels, functions drawn from the prior will have a fixed length scale; when using our kernel, the length scale of functions drawn from the prior can take a number a range of values as a result of the distribution over length scales. When our prior is fused with observations to form a posterior \sc{gp}, we are able to describe functions that may have generated the observations over a range of length scales. When data is limited this is particularly crucial as a whole range of length scales may be permissible with regards to the data generated, even if one is favoured through type-II maximum likelihood methods. As data increases the range of permissible length scales reduces, eventually collapsing to the true length scale.
 
-We demonstrate the above behaviour and its advantage over other methods in this section. We begin by drawing a function from a prior {\scshape gp} with known length scale. From this we can generate a training set of between $X$ and $X$ observations in the domain $\mathcal{X}\in [-3,3]$. We train the hyperparameters or hyper-hyperparameters of our test methods using type-II maximum likelihood on the given training set. Now we go back to the original {\scshape gp} and draw a set of $X$ functions from the posterior (so that the functions still go through the original training data) with length scales ranging from $X$ to $X$. An example training set and resulting set of posterior functions can be seen in figure XXXX. A test set with $100$ observations is generated from each function and a log likelihood is calculated for each method. This process is repeated with $100$ different starting functions and training data.
+We demonstrate the above behaviour and its advantage over other methods in this section. We begin by drawing a function from a prior \sc{gp} with known length scale. From this we can generate a training set of between $X$ and $X$ observations in the domain $\mathcal{X}\in [-3,3]$. We train the hyperparameters or hyper-hyperparameters of our test methods using type-II maximum likelihood on the given training set. Now we go back to the original \sc{gp} and draw a set of $X$ functions from the posterior (so that the functions still go through the original training data) with length scales ranging from $X$ to $X$. An example training set and resulting set of posterior functions can be seen in figure XXXX. A test set with $100$ observations is generated from each function and a log likelihood is calculated for each method. This process is repeated with $100$ different starting functions and training data.
 
 We plot the mean and variance trials of the likelihood of the test data across all $X*100$ against the log length scale of the posterior function.
 
