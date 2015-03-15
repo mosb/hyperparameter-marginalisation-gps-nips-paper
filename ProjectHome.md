@@ -1,0 +1,1 @@
+approximate hyperparameter marginalisation for gps, a nips paper
